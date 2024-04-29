@@ -1,0 +1,23 @@
+name: Validate sonarqube spec
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.json'
+      - '**.yaml'
+  workflow_dispatch:               
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-node@v4
+          - run: npm install @openapitools/openapi-generator-cli -g
+          - name: Run openapi-generator validate YAML
+            id: openapi_validate_yaml
+            run: |
+                openapi-generator-cli validate -i sonarqube-api.yaml
+          - name: Run openapi-generator validate JSON
+            id: openapi_validate_json
+            run: |
+                openapi-generator-cli validate -i sonarqube-api.json
