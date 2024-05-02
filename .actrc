@@ -1,0 +1,2 @@
+# nektos/act .actrc file
+-P ubuntu-latest=catthehacker/ubuntu:java-tools-latest

@@ -1,0 +1,63 @@
+name: Refresh sonarqube spec
+on:
+  schedule:
+    - cron: "15 4 * * *"
+  workflow_dispatch:               
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.22.1'
+      - run: go version
+      - name: Check java found
+        id: check_java
+        run: |
+          if java --version; then
+              echo "installed=true" >> "$GITHUB_OUTPUT"
+              java --version
+          else
+              echo "installed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build
+        id: sonarqube_spec_build
+        run: |
+            go get
+            go build
+      - name: Run sonarqube-spec-json
+        id: sonarqube_spec_download_json
+        run: |
+            ./sonarqube-spec  -publicurl -outfile sonarqube-api.json -debug
+      - name: Install java
+        if: steps.check_java.outputs.installed == 'false' && ${{ env.ACT }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "11.x"
+      - uses: actions/setup-node@v4
+      - run: npm install @openapitools/openapi-generator-cli -g
+      - name: Run openapi-generator validate JSON
+        id: openapi_validate_json
+        run: |
+            openapi-generator-cli validate -i sonarqube-api.json
+      - name: Run openapi-generator-cli convert
+        id: openapi_convert
+        run: |
+          openapi-generator-cli generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
+          cp ./output/openapi/openapi.yaml sonarqube-api.yaml
+      - name: Commit files
+        id: commit_files
+        continue-on-error: true
+        run: |
+          git branch -v
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "Automatic updates to cloudflare"
+      - name: Push files
+        if: ${{ steps.commit_files.outcome == 'success' }}
+        run: |
+          git push --set-upstream origin autoupdate
+
+
