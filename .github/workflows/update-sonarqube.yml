@@ -30,11 +30,6 @@ jobs:
         id: sonarqube_spec_download_json
         run: |
             ./sonarqube-spec  -publicurl -outfile sonarqube-api.json -debug
-      # - name: Setup ACT Java
-      #   run: |
-      #     sudo apt update -y
-      #     sudo  apt install default-jre -y
-      #   if: ${{ env.ACT }}
       - name: Install java
         if: steps.check_java.outputs.installed == 'false' && ${{ env.ACT }}
         uses: actions/setup-java@v4
