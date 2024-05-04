@@ -44,22 +44,22 @@ jobs:
       id-token: write # To sign.
       contents: write # To upload release assets.
       actions: read   # To read workflow path.
-#    strategy:
-#      matrix:
-#        os:
-#          - linux
-#          - darwin
-#        arch:
+    strategy:
+      matrix:
+        os:
+          - linux
+          - darwin
+        arch:
 #          - windows
-#          - amd64
-#          - arm64
+          - amd64
+          - arm64
     needs: args
     uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2.0.0
     with:
       go-version: 1.22.1
-      upload-tag-name: test-upload
+      upload-tag-name: manual-release
       upload-assets: true
-      evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}"
+      evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}, GOOS: ${{matrix.os}}, GOARCH: ${{matrix.arch}}"
   build:
     if: ${{ github.event_name != 'workflow_dispatch' }}
     permissions:
