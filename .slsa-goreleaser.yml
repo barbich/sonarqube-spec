@@ -32,7 +32,6 @@ goarch: amd64
 # Binary output name.
 # {{ .Os }} will be replaced by goos field in the config file.
 # {{ .Arch }} will be replaced by goarch field in the config file.
-#binary: binary-{{ .Env.VERSION }}-{{ .Os }}-{{ .Arch }}
-binary: "{{ .Env.BINNAME }}-{{ .Env.VERSION }}-{{ .Os }}-{{ .Arch }}"
-upload-assets: true
+binary: binary-{{ .Env.VERSION }}-{{ .Os }}-{{ .Arch }}
+#binary: "{{ .Env.BINNAME }}-{{ .Env.VERSION }}-{{ .Os }}-{{ .Arch }}"
 
