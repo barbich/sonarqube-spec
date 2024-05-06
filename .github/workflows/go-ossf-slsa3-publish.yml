@@ -21,7 +21,7 @@ permissions: read-all
 
 jobs:
   args:
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: self-hosted
     outputs:
       commit-date: ${{ steps.ldflags.outputs.commit-date }}
       commit: ${{ steps.ldflags.outputs.commit }}
