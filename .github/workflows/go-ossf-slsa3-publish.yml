@@ -92,7 +92,7 @@ jobs:
     permissions:
       contents: write # Needed to write artifacts to a release.
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'something' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
