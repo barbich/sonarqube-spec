@@ -6,7 +6,7 @@ jobs:
   upload-assets-wd:
     permissions:
       contents: write # Needed to write artifacts to a release.
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, self-hosted]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       - name: Checkout
@@ -29,11 +29,3 @@ jobs:
           done
       - name: Display structure of downloaded files
         run: ls -R
-      - name: Upload provenance
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: manual
-          prerelease: true
-          draft: true
-          files: |
-            binary/*
