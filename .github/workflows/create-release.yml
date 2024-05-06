@@ -17,6 +17,7 @@ jobs:
           repository: barbich/sonarqube-spec
           run-id: 8968397850
           merge-multiple: true
+          path: binary
       - name: Display structure of downloaded files
         run: ls -R
       - name: Rename artifacts
