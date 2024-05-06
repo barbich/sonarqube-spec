@@ -27,6 +27,7 @@ jobs:
       commit: ${{ steps.ldflags.outputs.commit }}
       version: ${{ steps.ldflags.outputs.version }}
       tree-state: ${{ steps.ldflags.outputs.tree-state }}
+      binname: ${{ steps.ldflags.outputs.binname }}
     steps:
       - id: checkout
         uses: actions/checkout@v4
@@ -38,28 +39,30 @@ jobs:
           echo "commit=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
           echo "version=$(git describe --tags --always --dirty | cut -c2-)" >> "$GITHUB_OUTPUT"
           echo "tree-state=$(if git diff --quiet; then echo "clean"; else echo "dirty"; fi)" >> "$GITHUB_OUTPUT"
+          echo "binname=$(go list -f '{{.Target}}' | xargs basename)" >> "$GITHUB_OUTPUT"
   build-test:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       id-token: write # To sign.
       contents: write # To upload release assets.
       actions: read   # To read workflow path.
-    strategy:
-      matrix:
-        os:
-          - linux
-          - darwin
-        arch:
+#    strategy:
+#      matrix:
+#        os:
+#          - linux
+#          - darwin
+#        arch:
 #          - windows
-          - amd64
-          - arm64
+#          - amd64
+#          - arm64
     needs: args
     uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2.0.0
     with:
       go-version: 1.22.1
       upload-tag-name: manual-release
       upload-assets: true
-      evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}, GOOS: ${{matrix.os}}, GOARCH: ${{matrix.arch}}"
+      draft-release: true
+      evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}, BINNAME: ${{needs.args.outputs.binname}}"
   build:
     if: ${{ github.event_name != 'workflow_dispatch' }}
     permissions:
@@ -79,5 +82,6 @@ jobs:
     uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2.0.0
     with:
       go-version: 1.22.1
+      draft-release: true
       upload-assets: true
       evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}"
