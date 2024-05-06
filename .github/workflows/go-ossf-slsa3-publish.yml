@@ -67,15 +67,25 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
       - name: Display structure of downloaded files
         run: ls -R
-#      - name: Upload provenance
-#        uses: softprops/action-gh-release@v2
-#        with:
-#          tag_name: manual
-#          prerelease: true
-#          files: |
+      - name: Rename artifacts
+        run: |
+          for filename in binary-*
+          do
+            mv $filename openapi-spec${filename/binary/}
+          done
+      - name: Upload provenance
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: manual
+          prerelease: true
+          draft: true
+          files: |
+            openapi-spec-*
 #            ${{ needs.build-dry.outputs.go-binary-name }}
 #            ${{ needs.provenance.outputs.go-provenance-name }}
 #          draft: ${{ inputs.draft-release }}
