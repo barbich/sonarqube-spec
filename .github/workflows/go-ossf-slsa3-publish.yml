@@ -41,7 +41,6 @@ jobs:
           echo "tree-state=$(if git diff --quiet; then echo "clean"; else echo "dirty"; fi)" >> "$GITHUB_OUTPUT"
           echo "binname=$(go list -f '{{.Target}}' | xargs basename)" >> "$GITHUB_OUTPUT"
   build:
-    runs-on: [self-hosted, ubuntu-latest]
     permissions:
       id-token: write # To sign.
       contents: write # To upload release assets.
