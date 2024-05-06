@@ -11,7 +11,7 @@
 # The provenance file can be verified using https://github.com/slsa-framework/slsa-verifier.
 # For more information about SLSA and how it improves the supply-chain, visit slsa.dev.
 
-name: SLSA Go releaser
+name: "SLSA Go releaser"
 on:
   workflow_dispatch:
   release:
@@ -27,6 +27,7 @@ jobs:
       commit: ${{ steps.ldflags.outputs.commit }}
       version: ${{ steps.ldflags.outputs.version }}
       tree-state: ${{ steps.ldflags.outputs.tree-state }}
+      binname: ${{ steps.ldflags.outputs.binname }}
     steps:
       - id: checkout
         uses: actions/checkout@v4
@@ -38,22 +39,76 @@ jobs:
           echo "commit=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
           echo "version=$(git describe --tags --always --dirty | cut -c2-)" >> "$GITHUB_OUTPUT"
           echo "tree-state=$(if git diff --quiet; then echo "clean"; else echo "dirty"; fi)" >> "$GITHUB_OUTPUT"
+          echo "binname=$(go list -f '{{.Target}}' | xargs basename)" >> "$GITHUB_OUTPUT"
   build:
     permissions:
       id-token: write # To sign.
       contents: write # To upload release assets.
       actions: read   # To read workflow path.
-    strategy:
-      matrix:
-        os:
-          - linux
-          - windows
-          - darwin
-        arch:
-          - amd64
-          - arm64
+#    strategy:
+#      matrix:
+#        os:
+#          - linux
+#          - darwin
+#        arch:
+#          - windows
+#          - amd64
+#          - arm64
+    needs: args
     uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2.0.0
     with:
       go-version: 1.22.1
-      upload-assets: true
       evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}"
+  upload-assets-wd:
+    needs: build
+    permissions:
+      contents: write # Needed to write artifacts to a release.
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: binary
+      - name: Rename artifacts
+        run: |
+          cd binary
+          for filename in binary-*
+          do
+            mv $filename openapi-spec${filename/binary/}
+          done
+      - name: Upload draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: manual
+          draft: true
+          files: |
+            binary/openapi-spec-*
+  upload-assets:
+    needs: build
+    permissions:
+      contents: write # Needed to write artifacts to a release.
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: binary
+      - name: Rename artifacts
+        run: |
+          cd binary
+          for filename in binary-*
+          do
+            mv $filename openapi-spec${filename/binary/}
+          done
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            binary/openapi-spec-*

@@ -12,13 +12,13 @@ flags:
   - -tags=netgo
 
 # The OS to compile for. `GOOS` env variable will be set to this value.
-# goos:
+goos: linux
 #  - windows
 #  - linux
 #  - darwin
 
 # The architecture to compile for. `GOARCH` env variable will be set to this value.
-#goarch:
+goarch: amd64
 #  - amd64
 #  - arm64
 #  - s390x
@@ -32,6 +32,6 @@ flags:
 # Binary output name.
 # {{ .Os }} will be replaced by goos field in the config file.
 # {{ .Arch }} will be replaced by goarch field in the config file.
-binary: binary-{{ .Version }}-{{ .Os }}-{{ .Arch }}
-upload-assets: true
+binary: binary-{{ .Env.VERSION }}-{{ .Os }}-{{ .Arch }}
+#binary: "{{ .Env.BINNAME }}-{{ .Env.VERSION }}-{{ .Os }}-{{ .Arch }}"
 
