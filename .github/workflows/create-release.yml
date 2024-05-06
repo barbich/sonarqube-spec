@@ -1,0 +1,36 @@
+name: "releaser"
+on:
+  workflow_dispatch:
+
+jobs:
+  upload-assets-wd:
+    permissions:
+      contents: write # Needed to write artifacts to a release.
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 8968397850
+          path: binary
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Rename artifacts
+        run: |
+          cd binary
+          for filename in binary-*
+          do
+            mv $filename openapi-spec${filename/binary/}
+          done
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Upload provenance
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: manual
+          prerelease: true
+          draft: true
+          files: |
+            openapi-spec-*
