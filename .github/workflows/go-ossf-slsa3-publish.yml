@@ -40,29 +40,6 @@ jobs:
           echo "version=$(git describe --tags --always --dirty | cut -c2-)" >> "$GITHUB_OUTPUT"
           echo "tree-state=$(if git diff --quiet; then echo "clean"; else echo "dirty"; fi)" >> "$GITHUB_OUTPUT"
           echo "binname=$(go list -f '{{.Target}}' | xargs basename)" >> "$GITHUB_OUTPUT"
-  build-test:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    permissions:
-      id-token: write # To sign.
-      contents: write # To upload release assets.
-      actions: read   # To read workflow path.
-#    strategy:
-#      matrix:
-#        os:
-#          - linux
-#          - darwin
-#        arch:
-#          - windows
-#          - amd64
-#          - arm64
-    needs: args
-    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2.0.0
-    with:
-      go-version: 1.22.1
-      upload-tag-name: manual-release
-      upload-assets: true
-      draft-release: true
-      evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}, BINNAME: ${{needs.args.outputs.binname}}"
   build:
     if: ${{ github.event_name != 'workflow_dispatch' }}
     permissions:
@@ -82,6 +59,23 @@ jobs:
     uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2.0.0
     with:
       go-version: 1.22.1
-      draft-release: true
-      upload-assets: true
       evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}"
+  upload-assets-wd:
+    needs: args
+    permissions:
+      contents: write # Needed to write artifacts to a release.
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/download-artifact@v4
+      - name: Display structure of downloaded files
+        run: ls -R
+#      - name: Upload provenance
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          tag_name: manual
+#          prerelease: true
+#          files: |
+            ${{ needs.build-dry.outputs.go-binary-name }}
+            ${{ needs.provenance.outputs.go-provenance-name }}
+          draft: ${{ inputs.draft-release }}
