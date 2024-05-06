@@ -70,14 +70,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
-      - name: Display structure of downloaded files
-        run: ls -R
       - name: Rename artifacts
         run: |
           for filename in binary-*
           do
             mv $filename openapi-spec${filename/binary/}
           done
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Upload provenance
         uses: softprops/action-gh-release@v2
         with:
