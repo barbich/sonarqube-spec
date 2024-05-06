@@ -21,7 +21,7 @@ permissions: read-all
 
 jobs:
   args:
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: ubuntu-latest
     outputs:
       commit-date: ${{ steps.ldflags.outputs.commit-date }}
       commit: ${{ steps.ldflags.outputs.commit }}
@@ -63,7 +63,7 @@ jobs:
     needs: build
     permissions:
       contents: write # Needed to write artifacts to a release.
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       - name: Checkout
@@ -90,7 +90,7 @@ jobs:
     needs: build
     permissions:
       contents: write # Needed to write artifacts to a release.
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: ubuntu-latest
     if: ${{ github.event_name == 'release' }}
     steps:
       - name: Checkout
