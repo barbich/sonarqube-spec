@@ -15,6 +15,8 @@ jobs:
         with:
           run-id: 8968397850
           path: binary
+          github-token: ${{ secrets.GH_PAT }} # token with actions:read permissions on target repo
+          repository: barbich/sonarqube-spec
       - name: Display structure of downloaded files
         run: ls -R
       - name: Rename artifacts
