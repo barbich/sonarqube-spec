@@ -41,7 +41,6 @@ jobs:
           echo "tree-state=$(if git diff --quiet; then echo "clean"; else echo "dirty"; fi)" >> "$GITHUB_OUTPUT"
           echo "binname=$(go list -f '{{.Target}}' | xargs basename)" >> "$GITHUB_OUTPUT"
   build:
-#    if: ${{ github.event_name != 'workflow_dispatch' }}
     permissions:
       id-token: write # To sign.
       contents: write # To upload release assets.
@@ -56,7 +55,7 @@ jobs:
 #          - amd64
 #          - arm64
     needs: args
-    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2.0.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v2
     with:
       go-version: 1.22.1
       evaluated-envs: "COMMIT_DATE:${{needs.args.outputs.commit-date}}, COMMIT:${{needs.args.outputs.commit}}, VERSION:${{needs.args.outputs.version}}, TREE_STATE:${{needs.args.outputs.tree-state}}"
@@ -80,7 +79,7 @@ jobs:
           do
             mv $filename openapi-spec${filename/binary/}
           done
-      - name: Upload release
+      - name: Upload draft release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: manual
@@ -92,7 +91,7 @@ jobs:
     permissions:
       contents: write # Needed to write artifacts to a release.
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'something' }}
+    if: ${{ github.event_name == 'release' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
