@@ -11,12 +11,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
-          run-id: 8968397850
-          path: binary
-          github-token: ${{ secrets.GH_PAT }} # token with actions:read permissions on target repo
+          github-token: ${{ secrets.GH_PAT }}
           repository: barbich/sonarqube-spec
+          run-id: 8968397850
+          merge-multiple: true
       - name: Display structure of downloaded files
         run: ls -R
       - name: Rename artifacts
