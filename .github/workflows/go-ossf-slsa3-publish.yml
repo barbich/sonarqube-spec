@@ -76,6 +76,6 @@ jobs:
 #          tag_name: manual
 #          prerelease: true
 #          files: |
-            ${{ needs.build-dry.outputs.go-binary-name }}
-            ${{ needs.provenance.outputs.go-provenance-name }}
-          draft: ${{ inputs.draft-release }}
+#            ${{ needs.build-dry.outputs.go-binary-name }}
+#            ${{ needs.provenance.outputs.go-provenance-name }}
+#          draft: ${{ inputs.draft-release }}
