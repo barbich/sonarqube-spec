@@ -47,18 +47,21 @@ jobs:
         run: |
           openapi-generator-cli generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
           cp ./output/openapi/openapi.yaml sonarqube-api.yaml
+      - name: Generate Git Tag
+        id: generate_tag
+        run: |
+          VERSION_API=$(jq .info.version sonarqube-api.json)
+          echo "Using tag: $VERSION_API"
+          echo "NEW_TAG=$VERSION_API" >> $GITHUB_ENV
       - name: Commit files
         id: commit_files
         continue-on-error: true
         run: |
-          git branch -v
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -a -m "Automatic updates to cloudflare"
-          git show-ref
+          git commit -a -m "Automatic updates"
       - name: Push files
         if: ${{ steps.commit_files.outcome == 'success' }}
         run: |
-          git push --set-upstream origin autoupdate
-
-
+          git tag $NEW_TAG
+          git push origin --tags
