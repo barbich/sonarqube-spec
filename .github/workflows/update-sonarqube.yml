@@ -50,7 +50,7 @@ jobs:
       - name: Generate Git Tag
         id: generate_tag
         run: |
-          VERSION_API=$(jq .info.version sonarqube-api.json)
+          VERSION_API=$(jq -r .info.version sonarqube-api.json)
           echo "Using tag: $VERSION_API"
           echo "NEW_TAG=$VERSION_API" >> $GITHUB_ENV
       - name: Commit files
