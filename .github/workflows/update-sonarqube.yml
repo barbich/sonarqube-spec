@@ -11,16 +11,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '>=1.22.1'
-      - run: go version
-      - name: Check java found
-        id: check_java
-        run: |
-          if java --version; then
-              echo "installed=true" >> "$GITHUB_OUTPUT"
-              java --version
-          else
-              echo "installed=false" >> "$GITHUB_OUTPUT"
-          fi
       - name: Build
         id: sonarqube_spec_build
         run: |
@@ -30,38 +20,61 @@ jobs:
         id: sonarqube_spec_download_json
         run: |
             ./sonarqube-spec  -publicurl -outfile sonarqube-api.json -debug
+      - name: Generate and verify Git Tag
+        id: generate_tag
+        run: |
+          git fetch --tags
+          VERSION_API=$(jq -r .info.version sonarqube-api.json)
+          IS_TAG=$(git tag --list "$VERSION_API")
+          if [ "$IS_TAG" == "$VERSION_API" ];  then
+            echo "Tag already present. Skipping further steps."
+            echo "skip_on_tag=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_on_tag=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "NEW_TAG=$VERSION_API" >> $GITHUB_ENV
+      - name: Check java found
+        id: check_java
+        if: steps.generate_tag.outputs.skip_on_tag == 'true'
+        run: |
+          if java --version; then
+              echo "installed=true" >> "$GITHUB_OUTPUT"
+              java --version
+          else
+              echo "installed=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Install java
-        if: steps.check_java.outputs.installed == 'false' && ${{ env.ACT }}
+        if: steps.check_java.outputs.installed == 'false' && ${{ env.ACT }} && steps.generate_tag.outputs.skip_on_tag == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "11.x"
       - uses: actions/setup-node@v4
-      - run: npm install @openapitools/openapi-generator-cli -g
+        if: steps.generate_tag.outputs.skip_on_tag == 'true'
       - name: Run openapi-generator validate JSON
         id: openapi_validate_json
+        if: steps.generate_tag.outputs.skip_on_tag == 'true'
         run: |
+            npm install @openapitools/openapi-generator-cli -g
             openapi-generator-cli validate -i sonarqube-api.json
       - name: Run openapi-generator-cli convert
         id: openapi_convert
+        if: steps.generate_tag.outputs.skip_on_tag == 'true'
         run: |
           openapi-generator-cli generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
           cp ./output/openapi/openapi.yaml sonarqube-api.yaml
-      - name: Generate Git Tag
-        id: generate_tag
-        run: |
-          VERSION_API=$(jq -r .info.version sonarqube-api.json)
-          echo "Using tag: $VERSION_API"
-          echo "NEW_TAG=$VERSION_API" >> $GITHUB_ENV
       - name: Commit files
         id: commit_files
+        if: steps.generate_tag.outputs.skip_on_tag == 'true'
         continue-on-error: true
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -a -m "Automatic updates"
       - name: Push files
-        if: ${{ steps.commit_files.outcome == 'success' }}
+        if: ${{ steps.commit_files.outcome == 'success' }} && steps.generate_tag.outputs.skip_on_tag == 'true'
         run: |
           git tag $NEW_TAG
           git push origin --tags
+
+
