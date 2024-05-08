@@ -4,8 +4,30 @@ on:
     - cron: "15 4 * * *"
   workflow_dispatch:               
 jobs:
+  pre-check:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    outputs:
+     update-required: ${{ steps.version_change.outputs.update-required }} 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check version change
+        id: version_change
+        run: |
+          VERSION_API=$(curl -s https://raw.githubusercontent.com/barbich/sonarqube-spec/main/sonarqube-api.json | jq -r .info.version)
+          VERSION_API_CURL=$(curl -s https://next.sonarqube.com/sonarqube/api/server/version)
+          if [ "$VERSION_API_CURL" == "$VERSION_API" ];  then
+            echo "Same version $VERSION_API_CURL $VERSION_API => No further processing required"
+            echo "update-required=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          else
+            echo "Different versions $VERSION_API_CURL $VERSION_API"
+            echo "update-required=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
   update:
     runs-on: ubuntu-latest
+    needs: pre-check
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -20,62 +42,44 @@ jobs:
         id: sonarqube_spec_download_json
         run: |
             ./sonarqube-spec  -publicurl -outfile sonarqube-api.json -debug
-      - name: Generate and verify Git Tag
-        id: generate_tag
-        run: |
-          git fetch --tags
-          VERSION_API=$(jq -r .info.version sonarqube-api.json)
-          IS_TAG=$(git tag --list "$VERSION_API")
-          if [ "$IS_TAG" == "$VERSION_API" ];  then
-            echo "Tag already present. Skipping further steps."
-            echo "skip_on_tag=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip_on_tag=false" >> "$GITHUB_OUTPUT"
-          fi
-          echo "NEW_TAG=$VERSION_API" >> $GITHUB_ENV
-      - name: Check java found
-        id: check_java
-        if: steps.generate_tag.outputs.skip_on_tag == 'false'
-        run: |
-          if java --version; then
-              echo "installed=true" >> "$GITHUB_OUTPUT"
-              java --version
-          else
-              echo "installed=false" >> "$GITHUB_OUTPUT"
-          fi
+      # - name: Check java found
+      #   id: check_java
+      #   run: |
+      #     if java --version; then
+      #         echo "installed=true" >> "$GITHUB_OUTPUT"
+      #         java --version
+      #     else
+      #         echo "installed=false" >> "$GITHUB_OUTPUT"
+      #     fi
       - name: Install java
         id: install_java
-        if: ${{ env.ACT && steps.generate_tag.outputs.skip_on_tag == 'false' && steps.check_java.outputs.installed == 'false' }}
+#        if: ${{ env.ACT && steps.generate_tag.outputs.skip_on_tag == 'false' && steps.check_java.outputs.installed == 'false' }}
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "11.x"
       - uses: actions/setup-node@v4
-        if: steps.generate_tag.outputs.skip_on_tag == 'false'
       - name: Run openapi-generator validate JSON
         id: openapi_validate_json
-        if: steps.generate_tag.outputs.skip_on_tag == 'false'
         run: |
             npm install @openapitools/openapi-generator-cli -g
             openapi-generator-cli validate -i sonarqube-api.json
       - name: Run openapi-generator-cli convert
         id: openapi_convert
-        if: steps.generate_tag.outputs.skip_on_tag == 'false'
+#        if: ${{ steps.generate_tag.outputs.skip_on_tag == 'false' }}
         run: |
           openapi-generator-cli generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
           cp ./output/openapi/openapi.yaml sonarqube-api.yaml
       - name: Commit files
         id: commit_files
-        if: steps.generate_tag.outputs.skip_on_tag == 'false'
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -a -m "Automatic updates"
+          git commit -m "Automatic updates" sonarqube-api.yaml sonarqube-api.json
       - name: Push files
         continue-on-error: true
-        if: ${{ steps.commit_files.outcome == 'success' && steps.generate_tag.outputs.skip_on_tag == 'false' }}
+#        if: ${{ steps.commit_files.outcome == 'success' && steps.generate_tag.outputs.skip_on_tag == 'false' }}
         run: |
-          git tag $NEW_TAG
-          git push origin --tags
+          git push origin
 
 
