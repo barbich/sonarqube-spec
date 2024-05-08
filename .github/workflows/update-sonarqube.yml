@@ -44,12 +44,12 @@ jobs:
               echo "installed=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Install java
-        if: steps.check_java.outputs.installed == 'false' && ${{ env.ACT }} && steps.generate_tag.outputs.skip_on_tag == 'false'
+        id: install_java
+        if: ${{ env.ACT }} && steps.generate_tag.outputs.skip_on_tag == 'false'
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "11.x"
-          ACTIONS_STEP_DEBUG: true
       - uses: actions/setup-node@v4
         if: steps.generate_tag.outputs.skip_on_tag == 'false'
       - name: Run openapi-generator validate JSON
