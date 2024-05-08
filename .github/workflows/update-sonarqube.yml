@@ -45,7 +45,7 @@ jobs:
           fi
       - name: Install java
         id: install_java
-        if: ${{ env.ACT }} && steps.generate_tag.outputs.skip_on_tag == 'false'
+        if: ${{ env.ACT && steps.generate_tag.outputs.skip_on_tag == 'false' && steps.check_java.outputs.installed == 'false' }}
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
@@ -73,10 +73,8 @@ jobs:
           git commit -a -m "Automatic updates"
       - name: Push files
         continue-on-error: true
-        if: steps.generate_tag.outputs.skip_on_tag == 'false'
+        if: ${{ steps.commit_files.outcome == 'success' && steps.generate_tag.outputs.skip_on_tag == 'false' }}
         run: |
-          echo ${{join(steps.generate_tag.outputs.*, '\n')}}
-          echo ${{join(steps.check_java.outputs.*, '\n')}}
           git tag $NEW_TAG
           git push origin --tags
 
