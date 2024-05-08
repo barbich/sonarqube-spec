@@ -35,7 +35,7 @@ jobs:
           echo "NEW_TAG=$VERSION_API" >> $GITHUB_ENV
       - name: Check java found
         id: check_java
-        if: steps.generate_tag.outputs.skip_on_tag == 'true'
+        if: steps.generate_tag.outputs.skip_on_tag == 'false'
         run: |
           if java --version; then
               echo "installed=true" >> "$GITHUB_OUTPUT"
@@ -44,35 +44,35 @@ jobs:
               echo "installed=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Install java
-        if: steps.check_java.outputs.installed == 'false' && ${{ env.ACT }} && steps.generate_tag.outputs.skip_on_tag == 'true'
+        if: steps.check_java.outputs.installed == 'false' && ${{ env.ACT }} && steps.generate_tag.outputs.skip_on_tag == 'false'
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "11.x"
       - uses: actions/setup-node@v4
-        if: steps.generate_tag.outputs.skip_on_tag == 'true'
+        if: steps.generate_tag.outputs.skip_on_tag == 'false'
       - name: Run openapi-generator validate JSON
         id: openapi_validate_json
-        if: steps.generate_tag.outputs.skip_on_tag == 'true'
+        if: steps.generate_tag.outputs.skip_on_tag == 'false'
         run: |
             npm install @openapitools/openapi-generator-cli -g
             openapi-generator-cli validate -i sonarqube-api.json
       - name: Run openapi-generator-cli convert
         id: openapi_convert
-        if: steps.generate_tag.outputs.skip_on_tag == 'true'
+        if: steps.generate_tag.outputs.skip_on_tag == 'false'
         run: |
           openapi-generator-cli generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
           cp ./output/openapi/openapi.yaml sonarqube-api.yaml
       - name: Commit files
         id: commit_files
-        if: steps.generate_tag.outputs.skip_on_tag == 'true'
+        if: steps.generate_tag.outputs.skip_on_tag == 'false'
         continue-on-error: true
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -a -m "Automatic updates"
       - name: Push files
-        if: ${{ steps.commit_files.outcome == 'success' }} && steps.generate_tag.outputs.skip_on_tag == 'true'
+        if: ${{ steps.commit_files.outcome == 'success' }} && steps.generate_tag.outputs.skip_on_tag == 'false'
         run: |
           git tag $NEW_TAG
           git push origin --tags
