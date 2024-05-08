@@ -49,6 +49,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "11.x"
+          ACTIONS_STEP_DEBUG: true
       - uses: actions/setup-node@v4
         if: steps.generate_tag.outputs.skip_on_tag == 'false'
       - name: Run openapi-generator validate JSON
@@ -66,14 +67,16 @@ jobs:
       - name: Commit files
         id: commit_files
         if: steps.generate_tag.outputs.skip_on_tag == 'false'
-        continue-on-error: true
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -a -m "Automatic updates"
       - name: Push files
-        if: ${{ steps.commit_files.outcome == 'success' }} && steps.generate_tag.outputs.skip_on_tag == 'false'
+        continue-on-error: true
+        if: steps.generate_tag.outputs.skip_on_tag == 'false'
         run: |
+          echo ${{join(steps.generate_tag.outputs.*, '\n')}}
+          echo ${{join(steps.check_java.outputs.*, '\n')}}
           git tag $NEW_TAG
           git push origin --tags
 
