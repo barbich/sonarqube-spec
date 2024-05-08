@@ -6,13 +6,12 @@ on:
     inputs:
       simulate:
         description: 'Simulate a succesfull check'
-        default: true
+        default: false
         required: true
         type: boolean
 jobs:
   pre-check:
     runs-on: ubuntu-latest
-    continue-on-error: true
     outputs:
      update-required: ${{ steps.version_change.outputs.update-required }} 
     steps:
@@ -26,16 +25,14 @@ jobs:
           if [ "$VERSION_API_CURL" == "$VERSION_API" ];  then
             echo "Same version $VERSION_API_CURL $VERSION_API => No further processing required"
             echo "update-required=false" >> "$GITHUB_OUTPUT"
-            exit 1
           else
             echo "Different versions $VERSION_API_CURL $VERSION_API"
             echo "update-required=true" >> "$GITHUB_OUTPUT"
-            exit 0
           fi
   update:
     runs-on: ubuntu-latest
     needs: pre-check
-    if: ${{ (always() && inputs.simulate == true) }}
+    if: ${{  inputs.simulate == true || ${{needs.pre-check.outputs.update-required}}==true }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
