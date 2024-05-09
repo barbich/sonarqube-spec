@@ -72,4 +72,4 @@ jobs:
         continue-on-error: true
         run: |
           echo "Doing a push"
-          # git push origin
+          git push origin
