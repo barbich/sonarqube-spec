@@ -42,7 +42,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "11.x"
-      - uses: actions/setup-node@v4
+      # - uses: actions/setup-node@v4
       - name: Build
         id: sonarqube_spec_build
         run: |
@@ -52,15 +52,21 @@ jobs:
         id: sonarqube_spec_download_json
         run: |
             ./sonarqube-spec  -publicurl -outfile sonarqube-api.json -debug
-      - name: Run openapi-generator validate JSON
+      - name: Get openapi-generator
+        id: get_openapi_generator
+        run: |
+            curl https://raw.githubusercontent.com/OpenAPITools/openapi-generator/master/bin/utils/openapi-generator-cli.sh > ./openapi-generator-cli
+            chmod +x ./openapi-generator-cli
+            export PATH=$PATH:.
+      - name: Run openapi-generator to validate JSON
         id: openapi_validate_json
         run: |
-            npm install @openapitools/openapi-generator-cli -g --silent
-            openapi-generator-cli validate -i sonarqube-api.json
+            # npm install @openapitools/openapi-generator-cli -g --silent
+            ./openapi-generator-cli validate -i sonarqube-api.json
       - name: Run openapi-generator-cli convert
         id: openapi_convert
         run: |
-          openapi-generator-cli generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
+          ./openapi-generator-cli generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
           cp ./output/openapi/openapi.yaml sonarqube-api.yaml
       - name: Commit files
         id: commit_files
