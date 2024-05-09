@@ -54,6 +54,7 @@ jobs:
       - name: Run openapi-generator to validate JSON
         id: openapi_validate_json
         run: |
+          ls
           ./openapi-generator-cli.sh validate -i sonarqube-api.json
           ls
       - name: Run openapi-generator-cli convert
