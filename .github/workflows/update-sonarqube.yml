@@ -19,8 +19,8 @@ jobs:
       - name: Check version change
         id: version_change
         run: |
-          # VERSION_API=$(curl -s https://raw.githubusercontent.com/barbich/sonarqube-spec/main/sonarqube-api.json | jq -r .info.version)
-          VERSION_API=$(curl -s https://raw.githubusercontent.com/barbich/sonarqube-spec/improve-update/sonarqube-api.json | jq -r .info.version)
+          VERSION_API=$(curl -s https://raw.githubusercontent.com/barbich/sonarqube-spec/main/sonarqube-api.json | jq -r .info.version)
+          # VERSION_API=$(curl -s https://raw.githubusercontent.com/barbich/sonarqube-spec/improve-update/sonarqube-api.json | jq -r .info.version)
           VERSION_API_CURL=$(curl -s https://next.sonarqube.com/sonarqube/api/server/version)
           if [ "$VERSION_API_CURL" == "$VERSION_API" ];  then
             echo "Same version $VERSION_API_CURL $VERSION_API => No further processing required"
