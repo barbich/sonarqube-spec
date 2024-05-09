@@ -51,16 +51,21 @@ jobs:
         id: sonarqube_spec_download_json
         run: |
           ./sonarqube-spec  -publicurl -outfile sonarqube-api.json -debug
+      - name: Cache openapi-generator
+        id: cache-openapi-generator
+        uses: actions/cache@v4
+        with:
+          path: '**.jar'
+          key: ${{ runner.os }}-openapi
       - name: Run openapi-generator to validate JSON
         id: openapi_validate_json
         run: |
           ls
           bash ./openapi-generator-cli.sh validate -i sonarqube-api.json
-          ls
       - name: Run openapi-generator-cli convert
         id: openapi_convert
         run: |
-          ./openapi-generator-cli.sh generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
+          bash ./openapi-generator-cli.sh generate -g openapi-yaml -i sonarqube-api.json --skip-overwrite --skip-validate-spec --skip-operation-example -o output
           cp ./output/openapi/openapi.yaml sonarqube-api.yaml
       - name: Commit files
         id: commit_files
