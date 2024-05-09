@@ -51,7 +51,7 @@ if [ ! -d "${DIR}" ]; then
 fi
 
 if [ ! -f ${DIR}/${jar} ]; then
-  wget -quiet https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/"$ver"/"$jar" -O "${DIR}"/"${jar}"
+  wget --quiet https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/"$ver"/"$jar" -O "${DIR}"/"${jar}"
 fi
 
 java -ea                          \
