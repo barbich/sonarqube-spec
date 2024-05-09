@@ -12,590 +12,6 @@
   }
  ],
  "paths": {
-  "/v2/authorizations/group-memberships/{id}": {
-   "delete": {
-    "tags": [
-     "group-membership-controller"
-    ],
-    "summary": "Remove a group membership",
-    "description": "Remove a user from a group",
-    "operationId": "delete",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The ID of the group membership to delete.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "204": {
-      "description": "No Content"
-     }
-    }
-   }
-  },
-  "/v2/dop-translation/github-permission-mappings": {
-   "get": {
-    "tags": [
-     "github-permissions-controller"
-    ],
-    "summary": "Fetch the GitHub permissions mapping",
-    "description": "Requires Administer System permission.",
-    "operationId": "fetchAll",
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GithubPermissionsMappingSearchRestResponse"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   },
-   "post": {
-    "tags": [
-     "github-permissions-controller"
-    ],
-    "summary": "Create a permission mapping for a GitHub custom role",
-    "description": "Requires Administer System permission.",
-    "operationId": "createMapping",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/GithubPermissionsMappingPostRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GithubPermissionsMappingResource"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   }
-  },
-  "/v2/dop-translation/gitlab-configurations": {
-   "get": {
-    "tags": [
-     "gitlab-configuration-controller"
-    ],
-    "summary": "Search GitLab configs",
-    "description": "  Get the list of GitLab configurations.\n  Note that a single configuration is supported at this time.\n  Requires 'Administer System' permission.\n",
-    "operationId": "searchGitlabConfiguration",
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GitlabConfigurationSearchRestResponse"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   },
-   "post": {
-    "tags": [
-     "gitlab-configuration-controller"
-    ],
-    "summary": "Create Gitlab configuration",
-    "description": "  Create a new Gitlab configuration.\n  Note that only a single configuration can exist at a time.\n  Requires 'Administer System' permission.\n",
-    "operationId": "create_2",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/GitlabConfigurationCreateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GitlabConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   }
-  },
-  "/v2/dop-translation/github-permission-mappings/{githubRole}": {
-   "delete": {
-    "tags": [
-     "github-permissions-controller"
-    ],
-    "summary": "Delete a single GitHub permission mapping",
-    "description": "Requires Administer System permission.",
-    "operationId": "deleteMapping",
-    "parameters": [
-     {
-      "name": "githubRole",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "204": {
-      "description": "No Content"
-     }
-    },
-    "x-internal": "true"
-   },
-   "patch": {
-    "tags": [
-     "github-permissions-controller"
-    ],
-    "summary": "Update a single GitHub permission mapping",
-    "description": "Requires Administer System permission.",
-    "operationId": "updateMapping",
-    "parameters": [
-     {
-      "name": "githubRole",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/GithubPermissionMappingUpdateRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GithubPermissionsMappingResource"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   }
-  },
-  "/v2/system/liveness": {
-   "get": {
-    "tags": [
-     "liveness-controller"
-    ],
-    "summary": "Provide liveness of SonarQube, meant to be used as a liveness probe on Kubernetes",
-    "description": "  Require 'Administer System' permission or authentication with passcode.\n\n  When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.\n\n  When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity\n",
-    "operationId": "livenessCheck",
-    "parameters": [
-     {
-      "name": "X-Sonar-Passcode",
-      "in": "header",
-      "description": "Passcode can be provided, see SonarQube documentation",
-      "required": false,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "default": {
-      "description": "This SonarQube node is not alive and should be rescheduled"
-     },
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "204": {
-      "description": "This SonarQube node is alive"
-     }
-    }
-   }
-  },
-  "/v2/analysis/version": {
-   "get": {
-    "tags": [
-     "version-controller"
-    ],
-    "summary": "Server version",
-    "description": "Get the version of the Scanner Engine",
-    "operationId": "getVersion",
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "text/plain": {
-        "schema": {
-         "type": "string"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/dop-translation/bound-projects": {
-   "post": {
-    "tags": [
-     "bound-projects-controller"
-    ],
-    "summary": "Create a SonarQube project with the information from the provided DevOps platform project.",
-    "description": "Create a SonarQube project with the information from the provided DevOps platform project.\nAutoconfigure Pull-Request decoration mechanism.\nRequires the 'Create Projects' permission\n",
-    "operationId": "createBoundProject",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/BoundProjectCreateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "201": {
-      "description": "Created",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/BoundProjectCreateRestResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
   "/v2/users-management/users/{id}": {
    "get": {
     "tags": [
@@ -616,8 +32,8 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -636,8 +52,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -687,8 +103,8 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -707,8 +123,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -750,8 +166,8 @@
      "required": true
     },
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -770,8 +186,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -848,8 +264,8 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -868,8 +284,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -890,563 +306,6 @@
      }
     },
     "x-internal": "true"
-   }
-  },
-  "/v2/dop-translation/dop-settings": {
-   "get": {
-    "tags": [
-     "dop-settings-controller"
-    ],
-    "summary": "List all DevOps Platform Integration settings",
-    "description": "Requires the 'Create Projects' permission ",
-    "operationId": "fetchAllDopSettings",
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/DopSettingsRestResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/dop-translation/gitlab-configurations/{id}": {
-   "get": {
-    "tags": [
-     "gitlab-configuration-controller"
-    ],
-    "summary": "Fetch a GitLab configuration",
-    "description": "Fetch a GitLab configuration. Requires 'Administer System' permission.\n",
-    "operationId": "getGitlabConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the configuration to fetch.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GitlabConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   },
-   "delete": {
-    "tags": [
-     "gitlab-configuration-controller"
-    ],
-    "summary": "Delete a GitLab configuration",
-    "description": "Delete a GitLab configuration.\nRequires 'Administer System' permission.\n",
-    "operationId": "deleteGitlabConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the configuration to delete.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "204": {
-      "description": "No Content"
-     }
-    },
-    "x-internal": "true"
-   },
-   "patch": {
-    "tags": [
-     "gitlab-configuration-controller"
-    ],
-    "summary": "Update a Gitlab configuration",
-    "description": "Update a Gitlab configuration. Requires 'Administer System' permission.\n",
-    "operationId": "updateGitlabConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/GitlabConfigurationUpdateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GitlabConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   }
-  },
-  "/v2/authorizations/groups/{id}": {
-   "get": {
-    "tags": [
-     "group-controller"
-    ],
-    "summary": "Fetch a single group",
-    "description": "Fetch a single group.",
-    "operationId": "fetchGroup",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the group to fetch.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GroupRestResponse"
-        }
-       }
-      }
-     }
-    }
-   },
-   "delete": {
-    "tags": [
-     "group-controller"
-    ],
-    "summary": "Deletes a group",
-    "description": "Deletes a group.",
-    "operationId": "deleteGroup",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The ID of the group to delete.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "204": {
-      "description": "No Content"
-     }
-    }
-   },
-   "patch": {
-    "tags": [
-     "group-controller"
-    ],
-    "summary": "Update a group",
-    "description": "Update a group name or description.\n",
-    "operationId": "updateGroup",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/GroupUpdateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GroupRestResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/dop-translation/gitlab-synchronization-runs": {
-   "post": {
-    "tags": [
-     "gitlab-synchronization-run-controller"
-    ],
-    "summary": "Starts a GitLab synchronization run.",
-    "description": "  Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.\n",
-    "operationId": "create_1",
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GitlabSynchronizationRunResource"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
-   }
-  },
-  "/v2/analysis/jres": {
-   "get": {
-    "tags": [
-     "jres-controller"
-    ],
-    "summary": "All JREs metadata",
-    "description": "Get metadata of all available JREs",
-    "operationId": "getJresMetadata",
-    "parameters": [
-     {
-      "name": "os",
-      "in": "query",
-      "description": "Filter the JRE by operating system. Accepted values are 'windows', 'linux', 'macos', 'alpine' (case-insensitive), with some aliases",
-      "required": false,
-      "schema": {
-       "type": "string"
-      }
-     },
-     {
-      "name": "arch",
-      "in": "query",
-      "description": "Filter the JRE by CPU architecture. Accepted values are 'x64' and 'aarch64' (case-insensitive), with some aliases.",
-      "required": false,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "type": "array",
-         "items": {
-          "$ref": "#/components/schemas/JreInfoRestResponse"
-         }
-        }
-       }
-      }
-     }
-    }
    }
   },
   "/v2/authorizations/groups": {
@@ -1505,8 +364,8 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -1525,8 +384,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -1565,8 +424,8 @@
      "required": true
     },
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -1585,8 +444,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -1608,17 +467,17 @@
     }
    }
   },
-  "/v2/analysis/engine": {
+  "/v2/analysis/version": {
    "get": {
     "tags": [
-     "scanner-engine-controller"
+     "version-controller"
     ],
-    "summary": "Scanner engine download/metadata",
-    "description": "This endpoint return the Scanner Engine metadata by default. To download the Scanner Engine, set the Accept header of the request to 'application/octet-stream'.",
-    "operationId": "downloadScannerEngine_1",
+    "summary": "Server version",
+    "description": "Get the version of the Scanner Engine",
+    "operationId": "getVersion",
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -1637,8 +496,60 @@
        }
       }
      },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "text/plain": {
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/analysis/engine": {
+   "get": {
+    "tags": [
+     "scanner-engine-controller"
+    ],
+    "summary": "Scanner engine download/metadata",
+    "description": "This endpoint return the Scanner Engine metadata by default. To download the Scanner Engine, set the Accept header of the request to 'application/octet-stream'.",
+    "operationId": "downloadScannerEngine_1",
+    "responses": {
      "500": {
       "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -1664,6 +575,858 @@
       }
      }
     }
+   }
+  },
+  "/v2/dop-translation/dop-settings": {
+   "get": {
+    "tags": [
+     "dop-settings-controller"
+    ],
+    "summary": "List all DevOps Platform Integration settings",
+    "description": "Requires the 'Create Projects' permission ",
+    "operationId": "fetchAllDopSettings",
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DopSettingsRestResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/github-permission-mappings/{githubRole}": {
+   "delete": {
+    "tags": [
+     "github-permissions-controller"
+    ],
+    "summary": "Delete a single GitHub permission mapping",
+    "description": "Requires Administer System permission.",
+    "operationId": "deleteMapping",
+    "parameters": [
+     {
+      "name": "githubRole",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "204": {
+      "description": "No Content"
+     }
+    },
+    "x-internal": "true"
+   },
+   "patch": {
+    "tags": [
+     "github-permissions-controller"
+    ],
+    "summary": "Update a single GitHub permission mapping",
+    "description": "Requires Administer System permission.",
+    "operationId": "updateMapping",
+    "parameters": [
+     {
+      "name": "githubRole",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/GithubPermissionMappingUpdateRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GithubPermissionsMappingResource"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   }
+  },
+  "/v2/analysis/jres": {
+   "get": {
+    "tags": [
+     "jres-controller"
+    ],
+    "summary": "All JREs metadata",
+    "description": "Get metadata of all available JREs",
+    "operationId": "getJresMetadata",
+    "parameters": [
+     {
+      "name": "os",
+      "in": "query",
+      "description": "Filter the JRE by operating system. Accepted values are 'windows', 'linux', 'macos', 'alpine' (case-insensitive), with some aliases",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "arch",
+      "in": "query",
+      "description": "Filter the JRE by CPU architecture. Accepted values are 'x64' and 'aarch64' (case-insensitive), with some aliases.",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/JreInfoRestResponse"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/project-bindings/{id}": {
+   "get": {
+    "tags": [
+     "project-bindings-controller"
+    ],
+    "summary": "Fetch a single Project Binding",
+    "operationId": "getProjectBinding",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the project-bindings to fetch.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectBinding"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   }
+  },
+  "/v2/dop-translation/gitlab-synchronization-runs": {
+   "post": {
+    "tags": [
+     "gitlab-synchronization-run-controller"
+    ],
+    "summary": "Starts a GitLab synchronization run.",
+    "description": "  Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.\n",
+    "operationId": "create_1",
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GitlabSynchronizationRunResource"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   }
+  },
+  "/v2/dop-translation/bound-projects": {
+   "post": {
+    "tags": [
+     "bound-projects-controller"
+    ],
+    "summary": "Create a SonarQube project with the information from the provided DevOps platform project.",
+    "description": "Create a SonarQube project with the information from the provided DevOps platform project.\nAutoconfigure Pull-Request decoration mechanism.\nRequires the 'Create Projects' permission\n",
+    "operationId": "createBoundProject",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BoundProjectCreateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "201": {
+      "description": "Created",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BoundProjectCreateRestResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/gitlab-configurations/{id}": {
+   "get": {
+    "tags": [
+     "gitlab-configuration-controller"
+    ],
+    "summary": "Fetch a GitLab configuration",
+    "description": "Fetch a GitLab configuration. Requires 'Administer System' permission.\n",
+    "operationId": "getGitlabConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the configuration to fetch.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GitlabConfigurationResource"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   },
+   "delete": {
+    "tags": [
+     "gitlab-configuration-controller"
+    ],
+    "summary": "Delete a GitLab configuration",
+    "description": "Delete a GitLab configuration.\nRequires 'Administer System' permission.\n",
+    "operationId": "deleteGitlabConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the configuration to delete.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "204": {
+      "description": "No Content"
+     }
+    },
+    "x-internal": "true"
+   },
+   "patch": {
+    "tags": [
+     "gitlab-configuration-controller"
+    ],
+    "summary": "Update a Gitlab configuration",
+    "description": "Update a Gitlab configuration. Requires 'Administer System' permission.\n",
+    "operationId": "updateGitlabConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/GitlabConfigurationUpdateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GitlabConfigurationResource"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   }
+  },
+  "/v2/system/health": {
+   "get": {
+    "tags": [
+     "health-controller"
+    ],
+    "operationId": "getHealth",
+    "parameters": [
+     {
+      "name": "X-Sonar-Passcode",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Health"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/authorizations/group-memberships/{id}": {
+   "delete": {
+    "tags": [
+     "group-membership-controller"
+    ],
+    "summary": "Remove a group membership",
+    "description": "Remove a user from a group",
+    "operationId": "delete",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The ID of the group membership to delete.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "204": {
+      "description": "No Content"
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/gitlab-configurations": {
+   "get": {
+    "tags": [
+     "gitlab-configuration-controller"
+    ],
+    "summary": "Search GitLab configs",
+    "description": "  Get the list of GitLab configurations.\n  Note that a single configuration is supported at this time.\n  Requires 'Administer System' permission.\n",
+    "operationId": "searchGitlabConfiguration",
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GitlabConfigurationSearchRestResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   },
+   "post": {
+    "tags": [
+     "gitlab-configuration-controller"
+    ],
+    "summary": "Create Gitlab configuration",
+    "description": "  Create a new Gitlab configuration.\n  Note that only a single configuration can exist at a time.\n  Requires 'Administer System' permission.\n",
+    "operationId": "create_2",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/GitlabConfigurationCreateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GitlabConfigurationResource"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
    }
   },
   "/v2/users-management/users": {
@@ -1803,8 +1566,8 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -1823,8 +1586,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -1863,8 +1626,8 @@
      "required": true
     },
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -1883,8 +1646,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -1899,6 +1662,252 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/UserRestResponseForAdmins"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/github-permission-mappings": {
+   "get": {
+    "tags": [
+     "github-permissions-controller"
+    ],
+    "summary": "Fetch the GitHub permissions mapping",
+    "description": "Requires Administer System permission.",
+    "operationId": "fetchAll",
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GithubPermissionsMappingSearchRestResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   },
+   "post": {
+    "tags": [
+     "github-permissions-controller"
+    ],
+    "summary": "Create a permission mapping for a GitHub custom role",
+    "description": "Requires Administer System permission.",
+    "operationId": "createMapping",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/GithubPermissionsMappingPostRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GithubPermissionsMappingResource"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   }
+  },
+  "/v2/clean-code-policy/rules": {
+   "post": {
+    "tags": [
+     "rule-controller"
+    ],
+    "summary": "Custom rule creation",
+    "description": "  Create a custom rule.\n  Requires the 'Administer Quality Profiles' permission.\n",
+    "operationId": "create_3",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RuleCreateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RuleRestResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-internal": "true"
+   }
+  },
+  "/v2/analysis/jres/{id}": {
+   "get": {
+    "tags": [
+     "jres-controller"
+    ],
+    "summary": "JRE download/metadata",
+    "description": "This endpoint return the JRE metadata by default. To download the JRE binary asset, set the Accept header of the request to 'application/octet-stream'.",
+    "operationId": "downloadJre_1",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The ID of the JRE",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/octet-stream": {
+        "schema": {
+         "type": "string",
+         "format": "binary"
+        }
+       },
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JreInfoRestResponse"
         }
        }
       }
@@ -1962,8 +1971,8 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -1982,8 +1991,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -2022,8 +2031,8 @@
      "required": true
     },
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -2042,8 +2051,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -2065,18 +2074,19 @@
     }
    }
   },
-  "/v2/dop-translation/project-bindings/{id}": {
+  "/v2/authorizations/groups/{id}": {
    "get": {
     "tags": [
-     "project-bindings-controller"
+     "group-controller"
     ],
-    "summary": "Fetch a single Project Binding",
-    "operationId": "getProjectBinding",
+    "summary": "Fetch a single group",
+    "description": "Fetch a single group.",
+    "operationId": "fetchGroup",
     "parameters": [
      {
       "name": "id",
       "in": "path",
-      "description": "The id of the project-bindings to fetch.",
+      "description": "The id of the group to fetch.",
       "required": true,
       "schema": {
        "type": "string"
@@ -2084,8 +2094,8 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -2104,8 +2114,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -2119,25 +2129,151 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ProjectBinding"
+         "$ref": "#/components/schemas/GroupRestResponse"
         }
        }
       }
      }
+    }
+   },
+   "delete": {
+    "tags": [
+     "group-controller"
+    ],
+    "summary": "Deletes a group",
+    "description": "Deletes a group.",
+    "operationId": "deleteGroup",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The ID of the group to delete.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "204": {
+      "description": "No Content"
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "group-controller"
+    ],
+    "summary": "Update a group",
+    "description": "Update a group name or description.\n",
+    "operationId": "updateGroup",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/GroupUpdateRestRequest"
+       }
+      }
+     },
+     "required": true
     },
-    "x-internal": "true"
+    "responses": {
+     "500": {
+      "description": "Internal Server Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad Request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Not Found",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RestError"
+        }
+       }
+      }
+     },
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GroupRestResponse"
+        }
+       }
+      }
+     }
+    }
    }
   },
-  "/v2/system/health": {
+  "/v2/system/liveness": {
    "get": {
     "tags": [
-     "health-controller"
+     "liveness-controller"
     ],
-    "operationId": "getHealth",
+    "summary": "Provide liveness of SonarQube, meant to be used as a liveness probe on Kubernetes",
+    "description": "  Require 'Administer System' permission or authentication with passcode.\n\n  When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.\n\n  When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity\n",
+    "operationId": "livenessCheck",
     "parameters": [
      {
       "name": "X-Sonar-Passcode",
       "in": "header",
+      "description": "Passcode can be provided, see SonarQube documentation",
       "required": false,
       "schema": {
        "type": "string"
@@ -2145,8 +2281,11 @@
      }
     ],
     "responses": {
-     "404": {
-      "description": "Not Found",
+     "default": {
+      "description": "This SonarQube node is not alive and should be rescheduled"
+     },
+     "500": {
+      "description": "Internal Server Error",
       "content": {
        "application/json": {
         "schema": {
@@ -2165,8 +2304,8 @@
        }
       }
      },
-     "500": {
-      "description": "Internal Server Error",
+     "404": {
+      "description": "Not Found",
       "content": {
        "application/json": {
         "schema": {
@@ -2175,149 +2314,10 @@
        }
       }
      },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/Health"
-        }
-       }
-      }
+     "204": {
+      "description": "This SonarQube node is alive"
      }
     }
-   }
-  },
-  "/v2/analysis/jres/{id}": {
-   "get": {
-    "tags": [
-     "jres-controller"
-    ],
-    "summary": "JRE download/metadata",
-    "description": "This endpoint return the JRE metadata by default. To download the JRE binary asset, set the Accept header of the request to 'application/octet-stream'.",
-    "operationId": "downloadJre_1",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The ID of the JRE",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/octet-stream": {
-        "schema": {
-         "type": "string",
-         "format": "binary"
-        }
-       },
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/JreInfoRestResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/clean-code-policy/rules": {
-   "post": {
-    "tags": [
-     "rule-controller"
-    ],
-    "summary": "Custom rule creation",
-    "description": "  Create a custom rule.\n  Requires the 'Administer Quality Profiles' permission.\n",
-    "operationId": "create_3",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/RuleCreateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "404": {
-      "description": "Not Found",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "400": {
-      "description": "Bad Request",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "500": {
-      "description": "Internal Server Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RestError"
-        }
-       }
-      }
-     },
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RuleRestResponse"
-        }
-       }
-      }
-     }
-    },
-    "x-internal": "true"
    }
   },
   "/api/alm_integrations/import_azure_project": {
@@ -7295,7 +7295,7 @@
      {
       "name": "metricKeys",
       "in": "query",
-      "description": "Comma-separated list of metric keys. Types DISTRIB are not allowed. For type DATA only security_issues, maintainability_issues, reliability_issues, new_maintainability_issues, new_security_issues, new_reliability_issues metrics are supported",
+      "description": "Comma-separated list of metric keys. Types DISTRIB are not allowed. For type DATA only new_maintainability_issues, reliability_issues, maintainability_issues, security_issues, new_reliability_issues, new_security_issues metrics are supported",
       "required": true,
       "allowEmptyValue": true,
       "schema": {
@@ -10931,7 +10931,7 @@
      {
       "name": "metric",
       "in": "query",
-      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003c/ul\u003e",
+      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003c/ul\u003e",
       "required": true,
       "allowEmptyValue": true,
       "schema": {
@@ -11707,7 +11707,7 @@
      {
       "name": "metric",
       "in": "query",
-      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003c/ul\u003e",
+      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003c/ul\u003e",
       "required": true,
       "allowEmptyValue": true,
       "schema": {
