@@ -77,7 +77,7 @@ jobs:
           cd binary
           for filename in binary-*
           do
-            mv $filename openapi-spec${filename/binary/}
+            mv $filename ${{needs.args.outputs.binname}}${filename/binary/}
           done
       - name: Upload draft release
         uses: softprops/action-gh-release@v2
@@ -85,7 +85,7 @@ jobs:
           tag_name: manual
           draft: true
           files: |
-            binary/openapi-spec-*
+            binary/${{needs.args.outputs.binname}}-*
   upload-assets:
     needs: build
     permissions:
@@ -104,11 +104,11 @@ jobs:
           cd binary
           for filename in binary-*
           do
-            mv $filename openapi-spec${filename/binary/}
+            mv $filename ${{needs.args.outputs.binname}}${filename/binary/}
           done
       - name: Upload release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: |
-            binary/openapi-spec-*
+            binary/${{needs.args.outputs.binname}}-*
