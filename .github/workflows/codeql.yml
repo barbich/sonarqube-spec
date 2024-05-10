@@ -16,8 +16,12 @@ on:
     branches: [ "main" ]
     paths-ignore:
       - '.github/workflows/**'
+      - '**.json'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - '.github/workflows/**'
+      - '**.json'
   schedule:
     - cron: '29 4 * * 5'
   workflow_dispatch:
