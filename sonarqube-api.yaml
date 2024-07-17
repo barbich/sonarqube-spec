@@ -4,11 +4,361 @@ info:
     The SonarQube API v2 is a REST API which enables you to interact with SonarQube programmatically. Endpoint listed here should work as expected.
     However, you should not consider the API stable for now as it is still under development. New releases of SonarQube can bring changes to existing endpoint definitions.
   title: SonarQube Web API v2
-  version: 10.7.0.92547
+  version: 10.7.0.92604
 servers:
 - description: Generated server url
   url: http://next.sonarqube.com/sonarqube
 paths:
+  /v2/authorizations/group-memberships:
+    get:
+      description: |2
+          Get the list of groups and members matching the query.
+      operationId: search_2
+      parameters:
+      - description: "ID of the user for which to search groups. If not set, all groups\
+          \ are returned."
+        explode: true
+        in: query
+        name: userId
+        required: false
+        schema:
+          description: "ID of the user for which to search groups. If not set, all\
+            \ groups are returned."
+          type: string
+        style: form
+      - description: "ID of the group for which to search members. If not set, all\
+          \ groups are returned."
+        explode: true
+        in: query
+        name: groupId
+        required: false
+        schema:
+          description: "ID of the group for which to search members. If not set, all\
+            \ groups are returned."
+          type: string
+        style: form
+      - description: Number of results per page. A value of 0 will only return the
+          pagination information.
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: "50"
+          description: Number of results per page. A value of 0 will only return the
+            pagination information.
+          maximum: 500
+          minimum: 0
+          type: string
+        style: form
+      - description: 1-based page index
+        explode: true
+        in: query
+        name: pageIndex
+        required: false
+        schema:
+          default: "1"
+          description: 1-based page index
+          minimum: 1
+          type: string
+        style: form
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupsMembershipSearchRestResponse'
+          description: OK
+      summary: Search across group memberships
+      tags:
+      - group-membership-controller
+    post:
+      description: Add a user to a group.
+      operationId: create_5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupMembershipCreateRestRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupMembershipRestResponse'
+          description: Created
+      summary: Add a group membership
+      tags:
+      - group-membership-controller
+  /v2/clean-code-policy/rules:
+    post:
+      description: |2
+          Create a custom rule.
+          Requires the 'Administer Quality Profiles' permission.
+      operationId: create_3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleCreateRestRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleRestResponse'
+          description: OK
+      summary: Custom rule creation
+      tags:
+      - rule-controller
+      x-internal: "true"
+  /v2/dop-translation/project-bindings:
+    get:
+      operationId: getProjectBindingByProjectId
+      parameters:
+      - description: |
+          Filter on the repository name.
+          This parameter performs an exact, case insensitive, match.
+        explode: true
+        in: query
+        name: repository
+        required: false
+        schema:
+          description: |
+            Filter on the repository name.
+            This parameter performs an exact, case insensitive, match.
+          type: string
+        style: form
+      - description: Filter on the DevOps Platform setting id.
+        explode: true
+        in: query
+        name: dopSettingId
+        required: false
+        schema:
+          description: Filter on the DevOps Platform setting id.
+          type: string
+        style: form
+      - description: Number of results per page. A value of 0 will only return the
+          pagination information.
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: "50"
+          description: Number of results per page. A value of 0 will only return the
+            pagination information.
+          maximum: 500
+          minimum: 0
+          type: string
+        style: form
+      - description: 1-based page index
+        explode: true
+        in: query
+        name: pageIndex
+        required: false
+        schema:
+          default: "1"
+          description: 1-based page index
+          minimum: 1
+          type: string
+        style: form
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectBindingsSearchRestResponse'
+          description: OK
+      summary: Search across project bindings
+      tags:
+      - project-bindings-controller
+      x-internal: "true"
+  /v2/dop-translation/gitlab-synchronization-runs:
+    post:
+      description: |2
+          Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.
+      operationId: create_1
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabSynchronizationRunResource'
+          description: OK
+      summary: Starts a GitLab synchronization run.
+      tags:
+      - gitlab-synchronization-run-controller
+      x-internal: "true"
+  /v2/system/liveness:
+    get:
+      description: |2
+          Require 'Administer System' permission or authentication with passcode.
+
+          When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.
+
+          When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity
+      operationId: livenessCheck
+      parameters:
+      - description: "Passcode can be provided, see SonarQube documentation"
+        explode: false
+        in: header
+        name: X-Sonar-Passcode
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        default:
+          description: This SonarQube node is not alive and should be rescheduled
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "204":
+          description: This SonarQube node is alive
+      summary: "Provide liveness of SonarQube, meant to be used as a liveness probe\
+        \ on Kubernetes"
+      tags:
+      - liveness-controller
+  /v2/dop-translation/dop-settings:
+    get:
+      description: 'Requires the ''Create Projects'' permission '
+      operationId: fetchAllDopSettings
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DopSettingsRestResponse'
+          description: OK
+      summary: List all DevOps Platform Integration settings
+      tags:
+      - dop-settings-controller
   /v2/users-management/users:
     get:
       description: |2
@@ -242,6 +592,710 @@ paths:
       summary: User creation
       tags:
       - user-controller
+  /v2/authorizations/groups:
+    get:
+      description: |2
+          Get the list of groups.
+          The results are sorted alphabetically by group name.
+      operationId: search_1
+      parameters:
+      - description: "Return managed or non-managed groups. Only available for managed\
+          \ instances, throws for non-managed instances"
+        explode: true
+        in: query
+        name: managed
+        required: false
+        schema:
+          description: "Return managed or non-managed groups. Only available for managed\
+            \ instances, throws for non-managed instances"
+          type: string
+        style: form
+      - description: |-
+          Filter on name.
+          This parameter can either perform an exact match, or a partial match (contains), it is case insensitive.
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          description: |-
+            Filter on name.
+            This parameter can either perform an exact match, or a partial match (contains), it is case insensitive.
+          type: string
+        style: form
+      - description: Number of results per page. A value of 0 will only return the
+          pagination information.
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: "50"
+          description: Number of results per page. A value of 0 will only return the
+            pagination information.
+          maximum: 500
+          minimum: 0
+          type: string
+        style: form
+      - description: 1-based page index
+        explode: true
+        in: query
+        name: pageIndex
+        required: false
+        schema:
+          default: "1"
+          description: 1-based page index
+          minimum: 1
+          type: string
+        style: form
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupsSearchRestResponse'
+          description: OK
+      summary: Group search
+      tags:
+      - group-controller
+    post:
+      description: Create a new group.
+      operationId: create_4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupCreateRestRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRestResponse'
+          description: Created
+      summary: Create a new group
+      tags:
+      - group-controller
+  /v2/dop-translation/gitlab-configurations/{id}:
+    delete:
+      description: |
+        Delete a GitLab configuration.
+        Requires 'Administer System' permission.
+      operationId: deleteGitlabConfiguration
+      parameters:
+      - description: The id of the configuration to delete.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "204":
+          description: No Content
+      summary: Delete a GitLab configuration
+      tags:
+      - gitlab-configuration-controller
+      x-internal: "true"
+    get:
+      description: |
+        Fetch a GitLab configuration. Requires 'Administer System' permission.
+      operationId: getGitlabConfiguration
+      parameters:
+      - description: The id of the configuration to fetch.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabConfigurationResource'
+          description: OK
+      summary: Fetch a GitLab configuration
+      tags:
+      - gitlab-configuration-controller
+      x-internal: "true"
+    patch:
+      description: |
+        Update a Gitlab configuration. Requires 'Administer System' permission.
+      operationId: updateGitlabConfiguration
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/GitlabConfigurationUpdateRestRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabConfigurationResource'
+          description: OK
+      summary: Update a Gitlab configuration
+      tags:
+      - gitlab-configuration-controller
+      x-internal: "true"
+  /v2/dop-translation/gitlab-configurations:
+    get:
+      description: |2
+          Get the list of GitLab configurations.
+          Note that a single configuration is supported at this time.
+          Requires 'Administer System' permission.
+      operationId: searchGitlabConfiguration
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabConfigurationSearchRestResponse'
+          description: OK
+      summary: Search GitLab configs
+      tags:
+      - gitlab-configuration-controller
+      x-internal: "true"
+    post:
+      description: |2
+          Create a new Gitlab configuration.
+          Note that only a single configuration can exist at a time.
+          Requires 'Administer System' permission.
+      operationId: create_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GitlabConfigurationCreateRestRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabConfigurationResource'
+          description: OK
+      summary: Create Gitlab configuration
+      tags:
+      - gitlab-configuration-controller
+      x-internal: "true"
+  /v2/system/migrations-status:
+    get:
+      description: Return the detailed status of ongoing database migrations including
+        starting date. If no migration is ongoing or needed it is still possible to
+        call this endpoint and receive appropriate information.
+      operationId: getStatus
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseMigrationsResponse'
+          description: OK
+      summary: "Gets the status of ongoing database migrations, if any"
+      tags:
+      - database-migrations-controller
+  /v2/dop-translation/project-bindings/{id}:
+    get:
+      operationId: getProjectBinding
+      parameters:
+      - description: The id of the project-bindings to fetch.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectBinding'
+          description: OK
+      summary: Fetch a single Project Binding
+      tags:
+      - project-bindings-controller
+      x-internal: "true"
+  /v2/dop-translation/github-permission-mappings/{githubRole}:
+    delete:
+      description: Requires Administer System permission.
+      operationId: deleteMapping
+      parameters:
+      - explode: false
+        in: path
+        name: githubRole
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "204":
+          description: No Content
+      summary: Delete a single GitHub permission mapping
+      tags:
+      - github-permissions-controller
+      x-internal: "true"
+    patch:
+      description: Requires Administer System permission.
+      operationId: updateMapping
+      parameters:
+      - explode: false
+        in: path
+        name: githubRole
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/GithubPermissionMappingUpdateRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubPermissionsMappingResource'
+          description: OK
+      summary: Update a single GitHub permission mapping
+      tags:
+      - github-permissions-controller
+      x-internal: "true"
+  /v2/dop-translation/github-configurations/{id}:
+    delete:
+      description: |
+        Delete a GitHub configuration.
+        Requires 'Administer System' permission.
+      operationId: deleteGithubConfiguration
+      parameters:
+      - description: The id of the configuration to delete.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "204":
+          description: No Content
+      summary: Delete a GitHub configuration
+      tags:
+      - github-configuration-controller
+      x-internal: "true"
+    get:
+      description: |
+        Fetch a GitHub configuration. Requires 'Administer System' permission.
+      operationId: getGithubConfiguration
+      parameters:
+      - description: The id of the configuration to fetch.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubConfigurationResource'
+          description: OK
+      summary: Fetch a GitHub configuration
+      tags:
+      - github-configuration-controller
+      x-internal: "true"
+    patch:
+      description: |
+        Update a GitHub configuration. Requires 'Administer System' permission.
+      operationId: updateGithubConfiguration
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/GithubConfigurationUpdateRestRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubConfigurationResource'
+          description: OK
+      summary: Update a GitHub configuration
+      tags:
+      - github-configuration-controller
+      x-internal: "true"
+  /v2/analysis/jres:
+    get:
+      description: Get metadata of all available JREs
+      operationId: getJresMetadata
+      parameters:
+      - description: "Filter the JRE by operating system. Accepted values are 'windows',\
+          \ 'linux', 'macos', 'alpine' (case-insensitive), with some aliases"
+        explode: true
+        in: query
+        name: os
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter the JRE by CPU architecture. Accepted values are 'x64'\
+          \ and 'aarch64' (case-insensitive), with some aliases."
+        explode: true
+        in: query
+        name: arch
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/JreInfoRestResponse'
+                type: array
+          description: OK
+      summary: All JREs metadata
+      tags:
+      - jres-controller
+  /v2/authorizations/group-memberships/{id}:
+    delete:
+      description: Remove a user from a group
+      operationId: delete
+      parameters:
+      - description: The ID of the group membership to delete.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "204":
+          description: No Content
+      summary: Remove a group membership
+      tags:
+      - group-membership-controller
   /v2/authorizations/groups/{id}:
     delete:
       description: Deletes a group.
@@ -365,668 +1419,6 @@ paths:
       summary: Update a group
       tags:
       - group-controller
-  /v2/dop-translation/project-bindings:
-    get:
-      operationId: getProjectBindingByProjectId
-      parameters:
-      - description: |
-          Filter on the repository name.
-          This parameter performs an exact, case insensitive, match.
-        explode: true
-        in: query
-        name: repository
-        required: false
-        schema:
-          description: |
-            Filter on the repository name.
-            This parameter performs an exact, case insensitive, match.
-          type: string
-        style: form
-      - description: Filter on the DevOps Platform setting id.
-        explode: true
-        in: query
-        name: dopSettingId
-        required: false
-        schema:
-          description: Filter on the DevOps Platform setting id.
-          type: string
-        style: form
-      - description: Number of results per page. A value of 0 will only return the
-          pagination information.
-        explode: true
-        in: query
-        name: pageSize
-        required: false
-        schema:
-          default: "50"
-          description: Number of results per page. A value of 0 will only return the
-            pagination information.
-          maximum: 500
-          minimum: 0
-          type: string
-        style: form
-      - description: 1-based page index
-        explode: true
-        in: query
-        name: pageIndex
-        required: false
-        schema:
-          default: "1"
-          description: 1-based page index
-          minimum: 1
-          type: string
-        style: form
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectBindingsSearchRestResponse'
-          description: OK
-      summary: Search across project bindings
-      tags:
-      - project-bindings-controller
-      x-internal: "true"
-  /v2/dop-translation/gitlab-configurations:
-    get:
-      description: |2
-          Get the list of GitLab configurations.
-          Note that a single configuration is supported at this time.
-          Requires 'Administer System' permission.
-      operationId: searchGitlabConfiguration
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabConfigurationSearchRestResponse'
-          description: OK
-      summary: Search GitLab configs
-      tags:
-      - gitlab-configuration-controller
-      x-internal: "true"
-    post:
-      description: |2
-          Create a new Gitlab configuration.
-          Note that only a single configuration can exist at a time.
-          Requires 'Administer System' permission.
-      operationId: create_2
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GitlabConfigurationCreateRestRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabConfigurationResource'
-          description: OK
-      summary: Create Gitlab configuration
-      tags:
-      - gitlab-configuration-controller
-      x-internal: "true"
-  /v2/authorizations/group-memberships:
-    get:
-      description: |2
-          Get the list of groups and members matching the query.
-      operationId: search_2
-      parameters:
-      - description: "ID of the user for which to search groups. If not set, all groups\
-          \ are returned."
-        explode: true
-        in: query
-        name: userId
-        required: false
-        schema:
-          description: "ID of the user for which to search groups. If not set, all\
-            \ groups are returned."
-          type: string
-        style: form
-      - description: "ID of the group for which to search members. If not set, all\
-          \ groups are returned."
-        explode: true
-        in: query
-        name: groupId
-        required: false
-        schema:
-          description: "ID of the group for which to search members. If not set, all\
-            \ groups are returned."
-          type: string
-        style: form
-      - description: Number of results per page. A value of 0 will only return the
-          pagination information.
-        explode: true
-        in: query
-        name: pageSize
-        required: false
-        schema:
-          default: "50"
-          description: Number of results per page. A value of 0 will only return the
-            pagination information.
-          maximum: 500
-          minimum: 0
-          type: string
-        style: form
-      - description: 1-based page index
-        explode: true
-        in: query
-        name: pageIndex
-        required: false
-        schema:
-          default: "1"
-          description: 1-based page index
-          minimum: 1
-          type: string
-        style: form
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupsMembershipSearchRestResponse'
-          description: OK
-      summary: Search across group memberships
-      tags:
-      - group-membership-controller
-    post:
-      description: Add a user to a group.
-      operationId: create_5
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GroupMembershipCreateRestRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupMembershipRestResponse'
-          description: Created
-      summary: Add a group membership
-      tags:
-      - group-membership-controller
-  /v2/dop-translation/project-bindings/{id}:
-    get:
-      operationId: getProjectBinding
-      parameters:
-      - description: The id of the project-bindings to fetch.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectBinding'
-          description: OK
-      summary: Fetch a single Project Binding
-      tags:
-      - project-bindings-controller
-      x-internal: "true"
-  /v2/analysis/version:
-    get:
-      description: Get the version of the Scanner Engine
-      operationId: getVersion
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            text/plain:
-              schema:
-                type: string
-          description: OK
-      summary: Server version
-      tags:
-      - version-controller
-  /v2/system/health:
-    get:
-      operationId: getHealth
-      parameters:
-      - explode: false
-        in: header
-        name: X-Sonar-Passcode
-        required: false
-        schema:
-          type: string
-        style: simple
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Health'
-          description: OK
-      tags:
-      - health-controller
-  /v2/dop-translation/github-configurations:
-    get:
-      description: |2
-          Get the list of GitHub configurations.
-          Note that a single configuration is supported at this time.
-          Requires 'Administer System' permission.
-      operationId: searchGithubConfiguration
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GithubConfigurationSearchRestResponse'
-          description: OK
-      summary: Search GitHub configs
-      tags:
-      - github-configuration-controller
-      x-internal: "true"
-    post:
-      description: |2
-          Create a new GitHub configuration.
-          Note that only a single configuration can exist at a time.
-          Requires 'Administer System' permission.
-      operationId: createGithubConfiguration
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GithubConfigurationCreateRestRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GithubConfigurationResource'
-          description: OK
-      summary: Create GitHub configuration
-      tags:
-      - github-configuration-controller
-      x-internal: "true"
-  /v2/authorizations/groups:
-    get:
-      description: |2
-          Get the list of groups.
-          The results are sorted alphabetically by group name.
-      operationId: search_1
-      parameters:
-      - description: "Return managed or non-managed groups. Only available for managed\
-          \ instances, throws for non-managed instances"
-        explode: true
-        in: query
-        name: managed
-        required: false
-        schema:
-          description: "Return managed or non-managed groups. Only available for managed\
-            \ instances, throws for non-managed instances"
-          type: string
-        style: form
-      - description: |-
-          Filter on name.
-          This parameter can either perform an exact match, or a partial match (contains), it is case insensitive.
-        explode: true
-        in: query
-        name: q
-        required: false
-        schema:
-          description: |-
-            Filter on name.
-            This parameter can either perform an exact match, or a partial match (contains), it is case insensitive.
-          type: string
-        style: form
-      - description: Number of results per page. A value of 0 will only return the
-          pagination information.
-        explode: true
-        in: query
-        name: pageSize
-        required: false
-        schema:
-          default: "50"
-          description: Number of results per page. A value of 0 will only return the
-            pagination information.
-          maximum: 500
-          minimum: 0
-          type: string
-        style: form
-      - description: 1-based page index
-        explode: true
-        in: query
-        name: pageIndex
-        required: false
-        schema:
-          default: "1"
-          description: 1-based page index
-          minimum: 1
-          type: string
-        style: form
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupsSearchRestResponse'
-          description: OK
-      summary: Group search
-      tags:
-      - group-controller
-    post:
-      description: Create a new group.
-      operationId: create_4
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GroupCreateRestRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupRestResponse'
-          description: Created
-      summary: Create a new group
-      tags:
-      - group-controller
-  /v2/authorizations/group-memberships/{id}:
-    delete:
-      description: Remove a user from a group
-      operationId: delete
-      parameters:
-      - description: The ID of the group membership to delete.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "204":
-          description: No Content
-      summary: Remove a group membership
-      tags:
-      - group-membership-controller
-  /v2/clean-code-policy/rules:
-    post:
-      description: |2
-          Create a custom rule.
-          Requires the 'Administer Quality Profiles' permission.
-      operationId: create_3
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RuleCreateRestRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RuleRestResponse'
-          description: OK
-      summary: Custom rule creation
-      tags:
-      - rule-controller
-      x-internal: "true"
   /v2/users-management/users/{id}:
     delete:
       description: Deactivates a user. Requires Administer System permission.
@@ -1170,59 +1562,10 @@ paths:
       summary: Update a user
       tags:
       - user-controller
-  /v2/dop-translation/github-configurations/{id}:
-    delete:
-      description: |
-        Delete a GitHub configuration.
-        Requires 'Administer System' permission.
-      operationId: deleteGithubConfiguration
-      parameters:
-      - description: The id of the configuration to delete.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "204":
-          description: No Content
-      summary: Delete a GitHub configuration
-      tags:
-      - github-configuration-controller
-      x-internal: "true"
+  /v2/analysis/version:
     get:
-      description: |
-        Fetch a GitHub configuration. Requires 'Administer System' permission.
-      operationId: getGithubConfiguration
-      parameters:
-      - description: The id of the configuration to fetch.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+      description: Get the version of the Scanner Engine
+      operationId: getVersion
       responses:
         "500":
           content:
@@ -1244,95 +1587,13 @@ paths:
           description: Not Found
         "200":
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: '#/components/schemas/GithubConfigurationResource'
+                type: string
           description: OK
-      summary: Fetch a GitHub configuration
+      summary: Server version
       tags:
-      - github-configuration-controller
-      x-internal: "true"
-    patch:
-      description: |
-        Update a GitHub configuration. Requires 'Administer System' permission.
-      operationId: updateGithubConfiguration
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/GithubConfigurationUpdateRestRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GithubConfigurationResource'
-          description: OK
-      summary: Update a GitHub configuration
-      tags:
-      - github-configuration-controller
-      x-internal: "true"
-  /v2/system/migrations-status:
-    get:
-      description: Return the detailed status of ongoing database migrations including
-        starting date. If no migration is ongoing or needed it is still possible to
-        call this endpoint and receive appropriate information.
-      operationId: getStatus
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DatabaseMigrationsResponse'
-          description: OK
-      summary: "Gets the status of ongoing database migrations, if any"
-      tags:
-      - database-migrations-controller
+      - version-controller
   /v2/analysis/engine:
     get:
       description: "This endpoint return the Scanner Engine metadata by default. To\
@@ -1370,71 +1631,13 @@ paths:
       summary: Scanner engine download/metadata
       tags:
       - scanner-engine-controller
-  /v2/dop-translation/bound-projects:
-    post:
-      description: |
-        Create a SonarQube project with the information from the provided DevOps platform project.
-        Autoconfigure Pull-Request decoration mechanism.
-        Requires the 'Create Projects' permission and setting a Personal Access Token with api/alm_integrations/set_pat for a user who will be using this endpoint
-      operationId: createBoundProject
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BoundProjectCreateRestRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BoundProjectCreateRestResponse'
-          description: Created
-      summary: Create a SonarQube project with the information from the provided DevOps
-        platform project.
-      tags:
-      - bound-projects-controller
-  /v2/analysis/jres:
+  /v2/dop-translation/github-configurations:
     get:
-      description: Get metadata of all available JREs
-      operationId: getJresMetadata
-      parameters:
-      - description: "Filter the JRE by operating system. Accepted values are 'windows',\
-          \ 'linux', 'macos', 'alpine' (case-insensitive), with some aliases"
-        explode: true
-        in: query
-        name: os
-        required: false
-        schema:
-          type: string
-        style: form
-      - description: "Filter the JRE by CPU architecture. Accepted values are 'x64'\
-          \ and 'aarch64' (case-insensitive), with some aliases."
-        explode: true
-        in: query
-        name: arch
-        required: false
-        schema:
-          type: string
-        style: form
+      description: |2
+          Get the list of GitHub configurations.
+          Note that a single configuration is supported at this time.
+          Requires 'Administer System' permission.
+      operationId: searchGithubConfiguration
       responses:
         "500":
           content:
@@ -1458,13 +1661,53 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/JreInfoRestResponse'
-                type: array
+                $ref: '#/components/schemas/GithubConfigurationSearchRestResponse'
           description: OK
-      summary: All JREs metadata
+      summary: Search GitHub configs
       tags:
-      - jres-controller
+      - github-configuration-controller
+      x-internal: "true"
+    post:
+      description: |2
+          Create a new GitHub configuration.
+          Note that only a single configuration can exist at a time.
+          Requires 'Administer System' permission.
+      operationId: createGithubConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GithubConfigurationCreateRestRequest'
+        required: true
+      responses:
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal Server Error
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Not Found
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubConfigurationResource'
+          description: OK
+      summary: Create GitHub configuration
+      tags:
+      - github-configuration-controller
+      x-internal: "true"
   /v2/analysis/jres/{id}:
     get:
       description: "This endpoint return the JRE metadata by default. To download\
@@ -1511,123 +1754,6 @@ paths:
       summary: JRE download/metadata
       tags:
       - jres-controller
-  /v2/dop-translation/gitlab-synchronization-runs:
-    post:
-      description: |2
-          Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.
-      operationId: create_1
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabSynchronizationRunResource'
-          description: OK
-      summary: Starts a GitLab synchronization run.
-      tags:
-      - gitlab-synchronization-run-controller
-      x-internal: "true"
-  /v2/dop-translation/github-permission-mappings/{githubRole}:
-    delete:
-      description: Requires Administer System permission.
-      operationId: deleteMapping
-      parameters:
-      - explode: false
-        in: path
-        name: githubRole
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "204":
-          description: No Content
-      summary: Delete a single GitHub permission mapping
-      tags:
-      - github-permissions-controller
-      x-internal: "true"
-    patch:
-      description: Requires Administer System permission.
-      operationId: updateMapping
-      parameters:
-      - explode: false
-        in: path
-        name: githubRole
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/GithubPermissionMappingUpdateRequest'
-        required: true
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GithubPermissionsMappingResource'
-          description: OK
-      summary: Update a single GitHub permission mapping
-      tags:
-      - github-permissions-controller
-      x-internal: "true"
   /v2/dop-translation/github-permission-mappings:
     get:
       description: Requires Administer System permission.
@@ -1699,105 +1825,18 @@ paths:
       tags:
       - github-permissions-controller
       x-internal: "true"
-  /v2/dop-translation/gitlab-configurations/{id}:
-    delete:
+  /v2/dop-translation/bound-projects:
+    post:
       description: |
-        Delete a GitLab configuration.
-        Requires 'Administer System' permission.
-      operationId: deleteGitlabConfiguration
-      parameters:
-      - description: The id of the configuration to delete.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "204":
-          description: No Content
-      summary: Delete a GitLab configuration
-      tags:
-      - gitlab-configuration-controller
-      x-internal: "true"
-    get:
-      description: |
-        Fetch a GitLab configuration. Requires 'Administer System' permission.
-      operationId: getGitlabConfiguration
-      parameters:
-      - description: The id of the configuration to fetch.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabConfigurationResource'
-          description: OK
-      summary: Fetch a GitLab configuration
-      tags:
-      - gitlab-configuration-controller
-      x-internal: "true"
-    patch:
-      description: |
-        Update a Gitlab configuration. Requires 'Administer System' permission.
-      operationId: updateGitlabConfiguration
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        Create a SonarQube project with the information from the provided DevOps platform project.
+        Autoconfigure Pull-Request decoration mechanism.
+        Requires the 'Create Projects' permission and setting a Personal Access Token with api/alm_integrations/set_pat for a user who will be using this endpoint
+      operationId: createBoundProject
       requestBody:
         content:
-          application/merge-patch+json:
+          application/json:
             schema:
-              $ref: '#/components/schemas/GitlabConfigurationUpdateRestRequest'
+              $ref: '#/components/schemas/BoundProjectCreateRestRequest'
         required: true
       responses:
         "500":
@@ -1818,60 +1857,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Not Found
-        "200":
+        "201":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GitlabConfigurationResource'
-          description: OK
-      summary: Update a Gitlab configuration
+                $ref: '#/components/schemas/BoundProjectCreateRestResponse'
+          description: Created
+      summary: Create a SonarQube project with the information from the provided DevOps
+        platform project.
       tags:
-      - gitlab-configuration-controller
-      x-internal: "true"
-  /v2/dop-translation/dop-settings:
+      - bound-projects-controller
+  /v2/system/health:
     get:
-      description: 'Requires the ''Create Projects'' permission '
-      operationId: fetchAllDopSettings
-      responses:
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Internal Server Error
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-          description: Not Found
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DopSettingsRestResponse'
-          description: OK
-      summary: List all DevOps Platform Integration settings
-      tags:
-      - dop-settings-controller
-  /v2/system/liveness:
-    get:
-      description: |2
-          Require 'Administer System' permission or authentication with passcode.
-
-          When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.
-
-          When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity
-      operationId: livenessCheck
+      operationId: getHealth
       parameters:
-      - description: "Passcode can be provided, see SonarQube documentation"
-        explode: false
+      - explode: false
         in: header
         name: X-Sonar-Passcode
         required: false
@@ -1879,8 +1879,6 @@ paths:
           type: string
         style: simple
       responses:
-        default:
-          description: This SonarQube node is not alive and should be rescheduled
         "500":
           content:
             application/json:
@@ -1899,12 +1897,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
           description: Not Found
-        "204":
-          description: This SonarQube node is alive
-      summary: "Provide liveness of SonarQube, meant to be used as a liveness probe\
-        \ on Kubernetes"
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+          description: OK
       tags:
-      - liveness-controller
+      - health-controller
   /api/alm_integrations/import_azure_project:
     description: Manage DevOps Platform Integrations
     post:
@@ -6067,9 +6067,9 @@ paths:
         style: form
       - allowEmptyValue: true
         description: "Comma-separated list of metric keys. Types DISTRIB are not allowed.\
-          \ For type DATA only security_issues, maintainability_issues, reliability_issues,\
-          \ new_maintainability_issues, new_security_issues, new_reliability_issues\
-          \ metrics are supported"
+          \ For type DATA only new_reliability_issues, new_security_issues, new_maintainability_issues,\
+          \ reliability_issues, maintainability_issues, security_issues metrics are\
+          \ supported"
         explode: true
         in: query
         name: metricKeys
@@ -9152,7 +9152,7 @@ paths:
       - allowEmptyValue: true
         description: Condition metric.<br/> Only metric of the following types are
           allowed:<ul><li>INT</li><li>MILLISEC</li><li>RATING</li><li>WORK_DUR</li><li>FLOAT</li><li>PERCENT</li><li>LEVEL</li></ul>Following
-          metrics are forbidden:<ul><li>alert_status</li><li>security_hotspots</li><li>new_security_hotspots</li></ul>
+          metrics are forbidden:<ul><li>security_hotspots</li><li>alert_status</li><li>new_security_hotspots</li></ul>
         explode: true
         in: query
         name: metric
@@ -9784,7 +9784,7 @@ paths:
       - allowEmptyValue: true
         description: Condition metric.<br/> Only metric of the following types are
           allowed:<ul><li>INT</li><li>MILLISEC</li><li>RATING</li><li>WORK_DUR</li><li>FLOAT</li><li>PERCENT</li><li>LEVEL</li></ul>Following
-          metrics are forbidden:<ul><li>alert_status</li><li>security_hotspots</li><li>new_security_hotspots</li></ul>
+          metrics are forbidden:<ul><li>security_hotspots</li><li>alert_status</li><li>new_security_hotspots</li></ul>
         explode: true
         in: query
         name: metric
