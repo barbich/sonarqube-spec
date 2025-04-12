@@ -4,11 +4,375 @@ info:
     The SonarQube API v2 is a REST API which enables you to interact with SonarQube programmatically. Endpoint listed here should work as expected.
     However, you should not consider the API stable for now as it is still under development. New releases of SonarQube can bring changes to existing endpoint definitions.
   title: SonarQube Web API v2
-  version: 2025.3.0.106089
+  version: 2025.3.0.106218
 servers:
 - description: Generated server url
   url: http://next.sonarqube.com/sonarqube
 paths:
+  /v2/architecture/file-graph:
+    get:
+      operationId: 弡
+      parameters:
+      - description: The key of the project.
+        explode: true
+        in: query
+        name: projectKey
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: The key of the branch.
+        explode: true
+        in: query
+        name: branchKey
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: "The source that produced this graph. eg. java, python, js, etc."
+        explode: true
+        in: query
+        name: source
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Find the file graph for this project branch and source.
+      tags:
+      - i
+      x-sonar-internal: "true"
+  /v2/system/liveness:
+    get:
+      description: |2
+          Require 'Administer System' permission or authentication with passcode.
+
+          When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.
+
+          When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity
+      operationId: livenessCheck
+      parameters:
+      - description: "Passcode can be provided, see SonarQube documentation"
+        explode: false
+        in: header
+        name: X-Sonar-Passcode
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        default:
+          description: This SonarQube node is not alive and should be rescheduled
+        "204":
+          description: This SonarQube node is alive
+      summary: "Provide liveness of SonarQube, meant to be used as a liveness probe\
+        \ on Kubernetes"
+      tags:
+      - default-liveness-controller
+  /v2/authorizations/groups/{id}:
+    delete:
+      description: Deletes a group.
+      operationId: deleteGroup
+      parameters:
+      - description: The ID of the group to delete.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content
+      summary: Deletes a group
+      tags:
+      - default-group-controller
+    get:
+      description: Fetch a single group.
+      operationId: fetchGroup
+      parameters:
+      - description: The id of the group to fetch.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRestResponse'
+          description: OK
+      summary: Fetch a single group
+      tags:
+      - default-group-controller
+    patch:
+      description: |
+        Update a group name or description.
+      operationId: updateGroup
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/GroupUpdateRestRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRestResponse'
+          description: OK
+      summary: Update a group
+      tags:
+      - default-group-controller
+  /v2/fix-suggestions/issues/{issueId}:
+    get:
+      description: Requires Code Viewer permission.
+      operationId: get_1
+      parameters:
+      - explode: false
+        in: path
+        name: issueId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixSuggestionIssueResponse'
+          description: OK
+      summary: Fetch AI suggestion availability for the given issueId
+      tags:
+      - fix-suggestion-issue-controller
+  /v2/system/email-configurations/{id}:
+    delete:
+      description: |
+        Delete an email configuration.
+        Requires 'Administer System' permission.
+      operationId: deleteEmailConfiguration
+      parameters:
+      - description: The id of the configuration to delete.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content
+      summary: Delete an email configuration
+      tags:
+      - default-email-configuration-controller
+      x-sonar-internal: "true"
+    get:
+      description: |
+        Fetch a Email configuration. Requires 'Administer System' permission.
+      operationId: getEmailConfiguration
+      parameters:
+      - description: The id of the configuration to fetch.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfigurationResource'
+          description: OK
+      summary: Fetch an email configuration
+      tags:
+      - default-email-configuration-controller
+      x-sonar-internal: "true"
+    patch:
+      description: |
+        Update an email configuration. Requires 'Administer System' permission.
+      operationId: updateEmailConfiguration
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/EmailConfigurationUpdateRestRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfigurationResource'
+          description: OK
+      summary: Update an email configuration
+      tags:
+      - default-email-configuration-controller
+      x-sonar-internal: "true"
+  /v2/dop-translation/gitlab-synchronization-runs:
+    post:
+      description: |2
+          Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.
+      operationId: create_2
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabSynchronizationRunResource'
+          description: OK
+      summary: Starts a GitLab synchronization run.
+      tags:
+      - gitlab-synchronization-run-controller
+      x-sonar-internal: "true"
+  /v2/dop-translation/github-configurations/{id}:
+    delete:
+      description: |
+        Delete a GitHub configuration.
+        Requires 'Administer System' permission.
+      operationId: deleteGithubConfiguration
+      parameters:
+      - description: The id of the configuration to delete.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a GitHub configuration
+      tags:
+      - default-github-configuration-controller
+      x-sonar-internal: "true"
+    get:
+      description: |
+        Fetch a GitHub configuration. Requires 'Administer System' permission.
+      operationId: getGithubConfiguration
+      parameters:
+      - description: The id of the configuration to fetch.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubConfigurationResource'
+          description: OK
+      summary: Fetch a GitHub configuration
+      tags:
+      - default-github-configuration-controller
+      x-sonar-internal: "true"
+    patch:
+      description: |
+        Update a GitHub configuration. Requires 'Administer System' permission.
+      operationId: updateGithubConfiguration
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/GithubConfigurationUpdateRestRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubConfigurationResource'
+          description: OK
+      summary: Update a GitHub configuration
+      tags:
+      - default-github-configuration-controller
+      x-sonar-internal: "true"
+  /v2/system/email-configurations:
+    get:
+      description: |2
+          Get the list of email configurations.
+          Note that a single configuration is supported at this time.
+          Requires 'Administer System' permission.
+      operationId: searchEmailConfigurations
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfigurationSearchRestResponse'
+          description: OK
+      summary: Search email configurations
+      tags:
+      - default-email-configuration-controller
+      x-sonar-internal: "true"
+    post:
+      description: |2
+          Create a new email configuration.
+          Note that only a single configuration can exist at a time.
+          Requires 'Administer System' permission.
+      operationId: createEmailConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfigurationCreateRestRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfigurationResource'
+          description: OK
+      summary: Create an email configuration
+      tags:
+      - default-email-configuration-controller
+      x-sonar-internal: "true"
   /v2/authorizations/groups:
     get:
       description: |2
@@ -96,68 +460,22 @@ paths:
       summary: Create a new group
       tags:
       - default-group-controller
-  /v2/sca/releases/{key}:
+  /v2/system/migrations-status:
     get:
-      description: |
-        Fetch a single release by its key.
-
-        This single-release endpoint lists full details for all dependencies
-        that mention the release.
-
-        In the terminology of this endpoint, a "release" is a version of
-        a package like "lodash 1.2.3", and a "dependency" is a specific file
-        and scope that pulls in the release such as "subproject/pom.xml test".
-        Each returned release may have multiple dependencies.
-
-        This is an internal API and is subject to change without notice.
-      operationId: fetchRelease
-      parameters:
-      - description: The key of the release to fetch.
-        explode: false
-        in: path
-        name: key
-        required: true
-        schema:
-          type: string
-        style: simple
+      description: Return the detailed status of ongoing database migrations including
+        starting date. If no migration is ongoing or needed it is still possible to
+        call this endpoint and receive appropriate information.
+      operationId: getStatus
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReleaseDetailResource'
+                $ref: '#/components/schemas/DatabaseMigrationsResponse'
           description: OK
-      summary: Get a single release
+      summary: "Gets the status of ongoing database migrations, if any"
       tags:
-      - a
-      x-sonar-internal: "true"
-  /v2/sca/issues-releases/{key}:
-    get:
-      description: |
-        Fetch a single (issue,release) pair (dependency risk), using the key from the search endpoint.
-
-        This is an internal API and is subject to change without notice.
-      operationId: fetchIssueRelease
-      parameters:
-      - description: "The key of the issue,release pair to fetch."
-        explode: false
-        in: path
-        name: key
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IssueReleaseDetailsResource'
-          description: OK
-      summary: Get a single issue-release pair
-      tags:
-      - a
-      x-sonar-internal: "true"
+      - database-migrations-controller
   /v2/system/health:
     get:
       operationId: getHealth
@@ -207,265 +525,8 @@ paths:
           description: OK
       summary: Get metadata for a specific CLI download
       tags:
-      - a
+      - i
       x-sonar-internal: "true"
-  /v2/fix-suggestions/service-info/subscription-type:
-    get:
-      operationId: getSubscriptionType
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SubscriptionTypeResponse'
-          description: OK
-      summary: Request subscription information of AI CodeFix service
-      tags:
-      - service-info-controller
-  /v2/dop-translation/gitlab-synchronization-runs:
-    post:
-      description: |2
-          Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.
-      operationId: create_2
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabSynchronizationRunResource'
-          description: OK
-      summary: Starts a GitLab synchronization run.
-      tags:
-      - gitlab-synchronization-run-controller
-      x-sonar-internal: "true"
-  /v2/fix-suggestions/feature-enablements:
-    get:
-      operationId: getFeatureEnablement_1
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FeatureEnablementResponse'
-          description: OK
-      summary: Fetch the Ai CodeFix feature enablement configurations
-      tags:
-      - feature-enablement-controller
-    patch:
-      operationId: updateFeatureEnablement_1
-      requestBody:
-        content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/FeatureEnablementRequest'
-        required: true
-      responses:
-        "204":
-          description: No Content
-      summary: Enable/Disable the AI CodeFix feature at the instance or project level
-      tags:
-      - feature-enablement-controller
-  /v2/dop-translation/project-bindings/{id}:
-    get:
-      operationId: getProjectBinding
-      parameters:
-      - description: The id of the project-bindings to fetch.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectBinding'
-          description: OK
-      summary: Fetch a single Project Binding
-      tags:
-      - default-project-bindings-controller
-      x-sonar-internal: "true"
-  /v2/fix-suggestions/issues/{issueId}:
-    get:
-      description: Requires Code Viewer permission.
-      operationId: get_1
-      parameters:
-      - explode: false
-        in: path
-        name: issueId
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FixSuggestionIssueResponse'
-          description: OK
-      summary: Fetch AI suggestion availability for the given issueId
-      tags:
-      - fix-suggestion-issue-controller
-  /v2/analysis/engine:
-    get:
-      description: "This endpoint return the Scanner Engine metadata by default. To\
-        \ download the Scanner Engine, set the Accept header of the request to 'application/octet-stream'."
-      operationId: downloadScannerEngine
-      responses:
-        "200":
-          content:
-            application/octet-stream:
-              schema:
-                $ref: '#/components/schemas/downloadScannerEngine_200_response'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/downloadScannerEngine_200_response'
-          description: OK
-      summary: Scanner engine download/metadata
-      tags:
-      - default-scanner-engine-controller
-  /v2/analysis/jres:
-    get:
-      description: Get metadata of all available JREs
-      operationId: getJresMetadata
-      parameters:
-      - description: "Filter the JRE by operating system. Accepted values are 'windows',\
-          \ 'linux', 'macos', 'alpine' (case-insensitive), with some aliases"
-        explode: true
-        in: query
-        name: os
-        required: false
-        schema:
-          type: string
-        style: form
-      - description: "Filter the JRE by CPU architecture. Accepted values are 'x64'\
-          \ and 'aarch64' (case-insensitive), with some aliases."
-        explode: true
-        in: query
-        name: arch
-        required: false
-        schema:
-          type: string
-        style: form
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/JreInfoRestResponse'
-                type: array
-          description: OK
-      summary: All JREs metadata
-      tags:
-      - default-jres-controller
-  /v2/clean-code-policy/rules:
-    post:
-      description: |2
-          Create a custom rule.
-          Requires the 'Administer Quality Profiles' permission.
-      operationId: create_4
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RuleCreateRestRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RuleRestResponse'
-          description: OK
-      summary: Custom rule creation
-      tags:
-      - default-rule-controller
-  /v2/dop-translation/bound-projects:
-    post:
-      description: |
-        Create a SonarQube project with the information from the provided DevOps platform project.
-        Autoconfigure Pull-Request decoration mechanism.
-        Requires the 'Create Projects' permission and setting a Personal Access Token with api/alm_integrations/set_pat for a user who will be using this endpoint
-      operationId: createBoundProject
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BoundProjectCreateRestRequest'
-        required: true
-      responses:
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BoundProjectCreateRestResponse'
-          description: Created
-      summary: Create a SonarQube project with the information from the provided DevOps
-        platform project.
-      tags:
-      - default-bound-projects-controller
-  /v2/clean-code-policy/mode:
-    get:
-      description: |
-        Fetch the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.
-      operationId: getMode
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ModeResource'
-          description: OK
-      summary: Retrieve current instance Mode
-      tags:
-      - default-mode-controller
-      x-sonar-internal: "true"
-    patch:
-      description: |
-        Update the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.
-        Requires 'Administer System' permission.
-      operationId: patchMode
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ModeResource'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ModeResource'
-          description: OK
-      summary: Update current instance Mode
-      tags:
-      - default-mode-controller
-      x-sonar-internal: "true"
-  /v2/authorizations/group-memberships/{id}:
-    delete:
-      description: Remove a user from a group
-      operationId: delete
-      parameters:
-      - description: The ID of the group membership to delete.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: No Content
-      summary: Remove a group membership
-      tags:
-      - default-group-membership-controller
   /v2/users-management/users:
     get:
       description: |2
@@ -663,75 +724,6 @@ paths:
       summary: User creation
       tags:
       - default-user-controller
-  /v2/dop-translation/github-permission-mappings:
-    get:
-      description: Get the list of all the existing roles with their permission mappings.
-        Requires 'Administer System' permission.
-      operationId: fetchAll_1
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionMappingsSearchRestResponse'
-          description: OK
-      summary: Fetch permissions mapping
-      tags:
-      - github-permission-mappings-controller
-      x-sonar-internal: "true"
-    post:
-      description: Requires 'Administer System' permission.
-      operationId: createMapping_1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PermissionMappingsPostRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionMappingsResource'
-          description: OK
-      summary: Create a permission mapping for a custom role
-      tags:
-      - github-permission-mappings-controller
-      x-sonar-internal: "true"
-  /v2/sca/feature-enablements:
-    get:
-      operationId: getFeatureEnablement
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FeatureEnablementResource'
-          description: OK
-      summary: Get the status of SCA enablement
-      tags:
-      - a
-      x-sonar-internal: "true"
-    patch:
-      operationId: updateFeatureEnablement
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FeatureEnablementRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FeatureEnablementResource'
-          description: OK
-      summary: Update SCA enablement settings
-      tags:
-      - a
-      x-sonar-internal: "true"
   /v2/sca/clis:
     get:
       description: |
@@ -781,19 +773,28 @@ paths:
           description: OK
       summary: Get available CLI downloads
       tags:
-      - a
+      - i
       x-sonar-internal: "true"
-  /v2/analysis/active_rules:
+  /v2/analysis/jres:
     get:
-      description: Used by the scanner-engine to get all active rules for a given
-        project.
-      operationId: getActiveRules
+      description: Get metadata of all available JREs
+      operationId: getJresMetadata
       parameters:
-      - description: Project Key
+      - description: "Filter the JRE by operating system. Accepted values are 'windows',\
+          \ 'linux', 'macos', 'alpine' (case-insensitive), with some aliases"
         explode: true
         in: query
-        name: projectKey
-        required: true
+        name: os
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter the JRE by CPU architecture. Accepted values are 'x64'\
+          \ and 'aarch64' (case-insensitive), with some aliases."
+        explode: true
+        in: query
+        name: arch
+        required: false
         schema:
           type: string
         style: form
@@ -803,264 +804,139 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/ActiveRule'
+                  $ref: '#/components/schemas/JreInfoRestResponse'
                 type: array
           description: OK
-      summary: Get all active rules for a specific project
-      tags:
-      - default-active-rules-controller
-  /v2/dop-translation/github-configurations:
-    get:
-      description: |2
-          Get the list of GitHub configurations.
-          Note that a single configuration is supported at this time.
-          Requires 'Administer System' permission.
-      operationId: searchGithubConfiguration
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GithubConfigurationSearchRestResponse'
-          description: OK
-      summary: Search GitHub configs
-      tags:
-      - default-github-configuration-controller
-      x-sonar-internal: "true"
-    post:
-      description: |2
-          Create a new GitHub configuration.
-          Note that only a single configuration can exist at a time.
-          Requires 'Administer System' permission.
-      operationId: createGithubConfiguration
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GithubConfigurationCreateRestRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GithubConfigurationResource'
-          description: OK
-      summary: Create GitHub configuration
-      tags:
-      - default-github-configuration-controller
-      x-sonar-internal: "true"
-  /v2/system/email-configurations:
-    get:
-      description: |2
-          Get the list of email configurations.
-          Note that a single configuration is supported at this time.
-          Requires 'Administer System' permission.
-      operationId: searchEmailConfigurations
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmailConfigurationSearchRestResponse'
-          description: OK
-      summary: Search email configurations
-      tags:
-      - default-email-configuration-controller
-      x-sonar-internal: "true"
-    post:
-      description: |2
-          Create a new email configuration.
-          Note that only a single configuration can exist at a time.
-          Requires 'Administer System' permission.
-      operationId: createEmailConfiguration
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EmailConfigurationCreateRestRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmailConfigurationResource'
-          description: OK
-      summary: Create an email configuration
-      tags:
-      - default-email-configuration-controller
-      x-sonar-internal: "true"
-  /v2/fix-suggestions/ai-suggestions:
-    post:
-      description: Requires Code Viewer permission.
-      operationId: create_1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FixSuggestionPostRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FixSuggestionResponse'
-          description: OK
-      summary: Suggest a fix for the given issueId
-      tags:
-      - fix-suggestion-controller
-  /v2/authorizations/groups/{id}:
-    delete:
-      description: Deletes a group.
-      operationId: deleteGroup
-      parameters:
-      - description: The ID of the group to delete.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: No Content
-      summary: Deletes a group
-      tags:
-      - default-group-controller
-    get:
-      description: Fetch a single group.
-      operationId: fetchGroup
-      parameters:
-      - description: The id of the group to fetch.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupRestResponse'
-          description: OK
-      summary: Fetch a single group
-      tags:
-      - default-group-controller
-    patch:
-      description: |
-        Update a group name or description.
-      operationId: updateGroup
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/GroupUpdateRestRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupRestResponse'
-          description: OK
-      summary: Update a group
-      tags:
-      - default-group-controller
-  /v2/analysis/jres/{id}:
-    get:
-      description: "This endpoint return the JRE metadata by default. To download\
-        \ the JRE binary asset, set the Accept header of the request to 'application/octet-stream'."
-      operationId: downloadJre
-      parameters:
-      - description: The ID of the JRE
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/octet-stream:
-              schema:
-                $ref: '#/components/schemas/downloadJre_200_response'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/downloadJre_200_response'
-          description: OK
-      summary: JRE download/metadata
+      summary: All JREs metadata
       tags:
       - default-jres-controller
-  /v2/system/migrations-status:
+  /v2/dop-translation/gitlab-permission-mappings:
     get:
-      description: Return the detailed status of ongoing database migrations including
-        starting date. If no migration is ongoing or needed it is still possible to
-        call this endpoint and receive appropriate information.
-      operationId: getStatus
+      description: Get the list of all the existing roles with their permission mappings.
+        Requires 'Administer System' permission.
+      operationId: fetchAll
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DatabaseMigrationsResponse'
+                $ref: '#/components/schemas/PermissionMappingsSearchRestResponse'
           description: OK
-      summary: "Gets the status of ongoing database migrations, if any"
+      summary: Fetch permissions mapping
       tags:
-      - database-migrations-controller
-  /v2/architecture/file-graph:
+      - gitlab-permission-mappings-controller
+      x-sonar-internal: "true"
+    post:
+      description: Requires 'Administer System' permission.
+      operationId: createMapping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionMappingsPostRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionMappingsResource'
+          description: OK
+      summary: Create a permission mapping for a custom role
+      tags:
+      - gitlab-permission-mappings-controller
+      x-sonar-internal: "true"
+  /v2/dop-translation/project-bindings/{id}:
     get:
-      operationId: 힋
+      operationId: getProjectBinding
       parameters:
-      - description: The key of the project.
-        explode: true
-        in: query
-        name: projectKey
+      - description: The id of the project-bindings to fetch.
+        explode: false
+        in: path
+        name: id
         required: true
         schema:
           type: string
-        style: form
-      - description: The key of the branch.
-        explode: true
-        in: query
-        name: branchKey
-        required: true
-        schema:
-          type: string
-        style: form
-      - description: "The source that produced this graph. eg. java, python, js, etc."
-        explode: true
-        in: query
-        name: source
-        required: true
-        schema:
-          type: string
-        style: form
+        style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProjectBinding'
           description: OK
-      summary: Find the file graph for this project branch and source.
+      summary: Fetch a single Project Binding
       tags:
-      - a
+      - default-project-bindings-controller
+      x-sonar-internal: "true"
+  /v2/dop-translation/github-permission-mappings:
+    get:
+      description: Get the list of all the existing roles with their permission mappings.
+        Requires 'Administer System' permission.
+      operationId: fetchAll_1
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionMappingsSearchRestResponse'
+          description: OK
+      summary: Fetch permissions mapping
+      tags:
+      - github-permission-mappings-controller
+      x-sonar-internal: "true"
+    post:
+      description: Requires 'Administer System' permission.
+      operationId: createMapping_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionMappingsPostRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionMappingsResource'
+          description: OK
+      summary: Create a permission mapping for a custom role
+      tags:
+      - github-permission-mappings-controller
+      x-sonar-internal: "true"
+  /v2/sca/feature-enablements:
+    get:
+      operationId: getFeatureEnablement
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureEnablementResource'
+          description: OK
+      summary: Get the status of SCA enablement
+      tags:
+      - i
+      x-sonar-internal: "true"
+    patch:
+      operationId: updateFeatureEnablement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureEnablementRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureEnablementResource'
+          description: OK
+      summary: Update SCA enablement settings
+      tags:
+      - i
       x-sonar-internal: "true"
   /v2/dop-translation/github-permission-mappings/{role}:
     delete:
@@ -1110,164 +986,6 @@ paths:
       summary: Update a single permission mapping
       tags:
       - github-permission-mappings-controller
-      x-sonar-internal: "true"
-  /v2/fix-suggestions/service-info:
-    get:
-      operationId: get
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceInfo'
-          description: OK
-      summary: Request status and subscription information of AI CodeFix service
-      tags:
-      - service-info-controller
-  /v2/analysis/version:
-    get:
-      description: Get the version of the Scanner Engine
-      operationId: getVersion
-      responses:
-        "200":
-          content:
-            text/plain:
-              schema:
-                type: string
-          description: OK
-      summary: Server version
-      tags:
-      - default-version-controller
-  /v2/dop-translation/gitlab-permission-mappings:
-    get:
-      description: Get the list of all the existing roles with their permission mappings.
-        Requires 'Administer System' permission.
-      operationId: fetchAll
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionMappingsSearchRestResponse'
-          description: OK
-      summary: Fetch permissions mapping
-      tags:
-      - gitlab-permission-mappings-controller
-      x-sonar-internal: "true"
-    post:
-      description: Requires 'Administer System' permission.
-      operationId: createMapping
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PermissionMappingsPostRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionMappingsResource'
-          description: OK
-      summary: Create a permission mapping for a custom role
-      tags:
-      - gitlab-permission-mappings-controller
-      x-sonar-internal: "true"
-  /v2/dop-translation/dop-settings:
-    get:
-      description: 'Requires the ''Create Projects'' permission '
-      operationId: fetchAllDopSettings
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DopSettingsRestResponse'
-          description: OK
-      summary: List all DevOps Platform Integration settings
-      tags:
-      - default-dop-settings-controller
-  /v2/sca/sbom-reports:
-    get:
-      description: |
-        Return a report based on the dependencies in this project's branch, using
-        the type parameter and Accept header to select the report to generate.
-
-        Right now, the available reports have specialized MIME types that
-        go along with those formats:
-
-        * CycloneDX: https://cyclonedx.org/specification/overview/
-          * JSON & XML
-        * SPDX 2.3: https://spdx.github.io/spdx-spec/v2.3/
-          * JSON & XML
-
-        Theoretically you could send just the MIME type for the format you wanted
-        as the Accept header and get that report. However, there may be other
-        formats that don't have a specific MIME type attached -- think two
-        different flavors of a CSV report, for example. In that case, we still
-        need a specific report type parameter to help differentiate more.
-
-        This is an internal API and is subject to change without notice.
-      operationId: generateReport
-      parameters:
-      - description: Key of the project to build report for
-        explode: true
-        in: query
-        name: projectKey
-        required: true
-        schema:
-          description: Key of the project to build report for
-          type: string
-        style: form
-      - description: Key of the branch to build report for
-        explode: true
-        in: query
-        name: branchKey
-        required: false
-        schema:
-          description: Key of the branch to build report for
-          type: string
-        style: form
-      - description: |
-          Type of report to generate.
-          The `Accept` header sent by the client determines the format of the report.
-          Currently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),
-          spdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)
-        explode: true
-        in: query
-        name: type
-        required: true
-        schema:
-          description: |
-            Type of report to generate.
-            The `Accept` header sent by the client determines the format of the report.
-            Currently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),
-            spdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)
-          enum:
-          - cyclonedx
-          - spdx_23
-          type: string
-        style: form
-      responses:
-        "200":
-          content:
-            application/vnd.cyclonedx+json:
-              schema:
-                type: string
-            application/vnd.cyclonedx+xml:
-              schema:
-                type: string
-            application/spdx+json:
-              schema:
-                type: string
-            application/spdx+xml:
-              schema:
-                type: string
-          description: The desired report in the desired output format
-      summary: Get a software bill of materials (SBOM) report
-      tags:
-      - a
       x-sonar-internal: "true"
   /v2/sca/issues-releases:
     get:
@@ -1390,17 +1108,15 @@ paths:
             match (contains and case insensitive) on the vulnerability ID.
           type: string
         style: form
-      - description: "Filter on the newInPullRequest attribute. TRUE stands for only\
-          \ releases introduced vs. the target branch, FALSE for releases shared with\
-          \ target."
+      - description: "Filter on the isNew attribute. TRUE stands for only releases\
+          \ introduced vs. the target branch, FALSE for releases shared with target."
         explode: true
         in: query
-        name: newInPullRequest
+        name: newlyIntroduced
         required: false
         schema:
-          description: "Filter on the newInPullRequest attribute. TRUE stands for\
-            \ only releases introduced vs. the target branch, FALSE for releases shared\
-            \ with target."
+          description: "Filter on the isNew attribute. TRUE stands for only releases\
+            \ introduced vs. the target branch, FALSE for releases shared with target."
           type: boolean
         style: form
       - description: "Filter on the direct attribute. TRUE stands for only direct\
@@ -1482,8 +1198,143 @@ paths:
           description: OK
       summary: Search for issue-release pairs
       tags:
-      - a
+      - i
       x-sonar-internal: "true"
+  /v2/dop-translation/github-configurations:
+    get:
+      description: |2
+          Get the list of GitHub configurations.
+          Note that a single configuration is supported at this time.
+          Requires 'Administer System' permission.
+      operationId: searchGithubConfiguration
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubConfigurationSearchRestResponse'
+          description: OK
+      summary: Search GitHub configs
+      tags:
+      - default-github-configuration-controller
+      x-sonar-internal: "true"
+    post:
+      description: |2
+          Create a new GitHub configuration.
+          Note that only a single configuration can exist at a time.
+          Requires 'Administer System' permission.
+      operationId: createGithubConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GithubConfigurationCreateRestRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubConfigurationResource'
+          description: OK
+      summary: Create GitHub configuration
+      tags:
+      - default-github-configuration-controller
+      x-sonar-internal: "true"
+  /v2/analysis/active_rules:
+    get:
+      description: Used by the scanner-engine to get all active rules for a given
+        project.
+      operationId: getActiveRules
+      parameters:
+      - description: Project Key
+        explode: true
+        in: query
+        name: projectKey
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ActiveRule'
+                type: array
+          description: OK
+      summary: Get all active rules for a specific project
+      tags:
+      - default-active-rules-controller
+  /v2/analysis/jres/{id}:
+    get:
+      description: "This endpoint return the JRE metadata by default. To download\
+        \ the JRE binary asset, set the Accept header of the request to 'application/octet-stream'."
+      operationId: downloadJre
+      parameters:
+      - description: The ID of the JRE
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/downloadJre_200_response'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/downloadJre_200_response'
+          description: OK
+      summary: JRE download/metadata
+      tags:
+      - default-jres-controller
+  /v2/clean-code-policy/rules:
+    post:
+      description: |2
+          Create a custom rule.
+          Requires the 'Administer Quality Profiles' permission.
+      operationId: create_4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleCreateRestRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleRestResponse'
+          description: OK
+      summary: Custom rule creation
+      tags:
+      - default-rule-controller
+  /v2/authorizations/group-memberships/{id}:
+    delete:
+      description: Remove a user from a group
+      operationId: delete
+      parameters:
+      - description: The ID of the group membership to delete.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content
+      summary: Remove a group membership
+      tags:
+      - default-group-membership-controller
   /v2/fix-suggestions/supported-llm-providers:
     get:
       description: Returns the LLM providers that could be used for requesting an
@@ -1501,6 +1352,99 @@ paths:
       summary: Get the supported LLM providers
       tags:
       - supported-llm-provider-controller
+  /v2/fix-suggestions/service-info:
+    get:
+      operationId: get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceInfo'
+          description: OK
+      summary: Request status and subscription information of AI CodeFix service
+      tags:
+      - service-info-controller
+  /v2/analysis/engine:
+    get:
+      description: "This endpoint return the Scanner Engine metadata by default. To\
+        \ download the Scanner Engine, set the Accept header of the request to 'application/octet-stream'."
+      operationId: downloadScannerEngine
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/downloadScannerEngine_200_response'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/downloadScannerEngine_200_response'
+          description: OK
+      summary: Scanner engine download/metadata
+      tags:
+      - default-scanner-engine-controller
+  /v2/dop-translation/gitlab-permission-mappings/{role}:
+    delete:
+      description: Requires 'Administer System' permission.
+      operationId: deleteMapping
+      parameters:
+      - description: The name of the role to delete
+        explode: false
+        in: path
+        name: role
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a single permission mappings
+      tags:
+      - gitlab-permission-mappings-controller
+      x-sonar-internal: "true"
+    patch:
+      description: Requires 'Administer System' permission.
+      operationId: updateMapping
+      parameters:
+      - description: The name of the role to update
+        explode: false
+        in: path
+        name: role
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/DevOpsPermissionMappingUpdateRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionMappingsResource'
+          description: OK
+      summary: Update a single permission mapping
+      tags:
+      - gitlab-permission-mappings-controller
+      x-sonar-internal: "true"
+  /v2/fix-suggestions/service-info/subscription-type:
+    get:
+      operationId: getSubscriptionType
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionTypeResponse'
+          description: OK
+      summary: Request subscription information of AI CodeFix service
+      tags:
+      - service-info-controller
   /v2/dop-translation/project-bindings:
     get:
       operationId: getProjectBindingByProjectId
@@ -1564,6 +1508,206 @@ paths:
       summary: Search across project bindings
       tags:
       - default-project-bindings-controller
+      x-sonar-internal: "true"
+  /v2/dop-translation/bound-projects:
+    post:
+      description: |
+        Create a SonarQube project with the information from the provided DevOps platform project.
+        Autoconfigure Pull-Request decoration mechanism.
+        Requires the 'Create Projects' permission and setting a Personal Access Token with api/alm_integrations/set_pat for a user who will be using this endpoint
+      operationId: createBoundProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoundProjectCreateRestRequest'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoundProjectCreateRestResponse'
+          description: Created
+      summary: Create a SonarQube project with the information from the provided DevOps
+        platform project.
+      tags:
+      - default-bound-projects-controller
+  /v2/fix-suggestions/feature-enablements:
+    get:
+      operationId: getFeatureEnablement_1
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureEnablementResponse'
+          description: OK
+      summary: Fetch the Ai CodeFix feature enablement configurations
+      tags:
+      - feature-enablement-controller
+    patch:
+      operationId: updateFeatureEnablement_1
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/FeatureEnablementRequest'
+        required: true
+      responses:
+        "204":
+          description: No Content
+      summary: Enable/Disable the AI CodeFix feature at the instance or project level
+      tags:
+      - feature-enablement-controller
+  /v2/sca/releases:
+    get:
+      description: |
+        Search for package releases that appear in the analyzed project,
+        as determined by software composition analysis.
+
+        This endpoint returns one result for each release,
+        rather than one result for each time a release is pulled in.
+        Each result may appear in multiple files or scopes that
+        all use the same version of the affected package.
+
+        The search results do not include full details on the dependencies
+        that pull in each release, only a summary. To get the full dependency
+        details, use the /releases/{key} endpoint for a single release.
+
+        In the terminology of this endpoint, a "release" is a version of
+        a package like "lodash 1.2.3", and a "dependency" is a specific file
+        and scope that pulls in the release such as "subproject/pom.xml test".
+        Each returned release may have multiple dependencies.
+
+        This is an internal API and is subject to change without notice.
+      operationId: search_3
+      parameters:
+      - description: Key of the project to fetch all dependencies from
+        explode: true
+        in: query
+        name: projectKey
+        required: true
+        schema:
+          description: Key of the project to fetch all dependencies from
+          type: string
+        style: form
+      - description: "Key of the Branch to fetch all dependencies from. If not provided,\
+          \ the default branch will be used unless a Pull Request Key is provided."
+        explode: true
+        in: query
+        name: branchKey
+        required: false
+        schema:
+          description: "Key of the Branch to fetch all dependencies from. If not provided,\
+            \ the default branch will be used unless a Pull Request Key is provided."
+          type: string
+        style: form
+      - description: Key of the Pull Request to fetch all dependencies from.
+        explode: true
+        in: query
+        name: pullRequestKey
+        required: false
+        schema:
+          description: Key of the Pull Request to fetch all dependencies from.
+          type: string
+        style: form
+      - description: "Filter on the direct attribute. TRUE stands for direct dependencies,\
+          \ FALSE for transitive dependencies."
+        explode: true
+        in: query
+        name: direct
+        required: false
+        schema:
+          description: "Filter on the direct attribute. TRUE stands for direct dependencies,\
+            \ FALSE for transitive dependencies."
+          type: boolean
+        style: form
+      - description: "Filter on the newlyIntroduced attribute. TRUE stands for only\
+          \ releases introduced vs. the target branch, FALSE for releases shared with\
+          \ target."
+        explode: true
+        in: query
+        name: newlyIntroduced
+        required: false
+        schema:
+          description: "Filter on the newlyIntroduced attribute. TRUE stands for only\
+            \ releases introduced vs. the target branch, FALSE for releases shared\
+            \ with target."
+          type: boolean
+        style: form
+      - description: "Filter on the productionScope attribute. TRUE stands for only\
+          \ production dependencies, FALSE for only not in production. If a release\
+          \ is both, it matches both."
+        explode: true
+        in: query
+        name: productionScope
+        required: false
+        schema:
+          description: "Filter on the productionScope attribute. TRUE stands for only\
+            \ production dependencies, FALSE for only not in production. If a release\
+            \ is both, it matches both."
+          type: boolean
+        style: form
+      - explode: true
+        in: query
+        name: packageManagers
+        required: false
+        schema:
+          description: Filter on the package manager
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        style: form
+      - description: Filter on the package name. This parameter performs a partial
+          match (contains and case insensitive) on the package name.
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          description: Filter on the package name. This parameter performs a partial
+            match (contains and case insensitive) on the package name.
+          type: string
+        style: form
+      - description: Number of results per page. A value of 0 will only return the
+          pagination information.
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 50
+          description: Number of results per page. A value of 0 will only return the
+            pagination information.
+          format: int32
+          maximum: 500
+          minimum: 0
+          type: integer
+        style: form
+      - description: 1-based page index
+        explode: true
+        in: query
+        name: pageIndex
+        required: false
+        schema:
+          default: 1
+          description: 1-based page index
+          format: int32
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReleasesSearchRestResponse'
+          description: OK
+      summary: Search for releases
+      tags:
+      - i
       x-sonar-internal: "true"
   /v2/users-management/users/{id}:
     delete:
@@ -1653,55 +1797,6 @@ paths:
       summary: Update a user
       tags:
       - default-user-controller
-  /v2/dop-translation/gitlab-permission-mappings/{role}:
-    delete:
-      description: Requires 'Administer System' permission.
-      operationId: deleteMapping
-      parameters:
-      - description: The name of the role to delete
-        explode: false
-        in: path
-        name: role
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: No Content
-      summary: Delete a single permission mappings
-      tags:
-      - gitlab-permission-mappings-controller
-      x-sonar-internal: "true"
-    patch:
-      description: Requires 'Administer System' permission.
-      operationId: updateMapping
-      parameters:
-      - description: The name of the role to update
-        explode: false
-        in: path
-        name: role
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/DevOpsPermissionMappingUpdateRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PermissionMappingsResource'
-          description: OK
-      summary: Update a single permission mapping
-      tags:
-      - gitlab-permission-mappings-controller
-      x-sonar-internal: "true"
   /v2/fix-suggestions/feature-enablements/awareness-banner-interactions:
     post:
       operationId: createAwarenessBannerClicked
@@ -1722,12 +1817,12 @@ paths:
       tags:
       - feature-enablement-controller
       x-sonar-internal: "true"
-  /v2/dop-translation/github-configurations/{id}:
+  /v2/dop-translation/gitlab-configurations/{id}:
     delete:
       description: |
-        Delete a GitHub configuration.
+        Delete a GitLab configuration.
         Requires 'Administer System' permission.
-      operationId: deleteGithubConfiguration
+      operationId: deleteGitlabConfiguration
       parameters:
       - description: The id of the configuration to delete.
         explode: false
@@ -1740,14 +1835,14 @@ paths:
       responses:
         "204":
           description: No Content
-      summary: Delete a GitHub configuration
+      summary: Delete a GitLab configuration
       tags:
-      - default-github-configuration-controller
+      - default-gitlab-configuration-controller
       x-sonar-internal: "true"
     get:
       description: |
-        Fetch a GitHub configuration. Requires 'Administer System' permission.
-      operationId: getGithubConfiguration
+        Fetch a GitLab configuration. Requires 'Administer System' permission.
+      operationId: getGitlabConfiguration
       parameters:
       - description: The id of the configuration to fetch.
         explode: false
@@ -1762,16 +1857,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubConfigurationResource'
+                $ref: '#/components/schemas/GitlabConfigurationResource'
           description: OK
-      summary: Fetch a GitHub configuration
+      summary: Fetch a GitLab configuration
       tags:
-      - default-github-configuration-controller
+      - default-gitlab-configuration-controller
       x-sonar-internal: "true"
     patch:
       description: |
-        Update a GitHub configuration. Requires 'Administer System' permission.
-      operationId: updateGithubConfiguration
+        Update a Gitlab configuration. Requires 'Administer System' permission.
+      operationId: updateGitlabConfiguration
       parameters:
       - explode: false
         in: path
@@ -1784,33 +1879,196 @@ paths:
         content:
           application/merge-patch+json:
             schema:
-              $ref: '#/components/schemas/GithubConfigurationUpdateRestRequest'
+              $ref: '#/components/schemas/GitlabConfigurationUpdateRestRequest'
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubConfigurationResource'
+                $ref: '#/components/schemas/GitlabConfigurationResource'
           description: OK
-      summary: Update a GitHub configuration
+      summary: Update a Gitlab configuration
       tags:
-      - default-github-configuration-controller
+      - default-gitlab-configuration-controller
       x-sonar-internal: "true"
-  /v2/sca/releases:
+  /v2/sca/sbom-reports:
     get:
       description: |
-        Search for package releases that appear in the analyzed project,
-        as determined by software composition analysis.
+        Return a report based on the dependencies in this project's branch, using
+        the type parameter and Accept header to select the report to generate.
 
-        This endpoint returns one result for each release,
-        rather than one result for each time a release is pulled in.
-        Each result may appear in multiple files or scopes that
-        all use the same version of the affected package.
+        Right now, the available reports have specialized MIME types that
+        go along with those formats:
 
-        The search results do not include full details on the dependencies
-        that pull in each release, only a summary. To get the full dependency
-        details, use the /releases/{key} endpoint for a single release.
+        * CycloneDX: https://cyclonedx.org/specification/overview/
+          * JSON & XML
+        * SPDX 2.3: https://spdx.github.io/spdx-spec/v2.3/
+          * JSON & XML
+
+        Theoretically you could send just the MIME type for the format you wanted
+        as the Accept header and get that report. However, there may be other
+        formats that don't have a specific MIME type attached -- think two
+        different flavors of a CSV report, for example. In that case, we still
+        need a specific report type parameter to help differentiate more.
+
+        This is an internal API and is subject to change without notice.
+      operationId: generateReport
+      parameters:
+      - description: Key of the project to build report for
+        explode: true
+        in: query
+        name: projectKey
+        required: true
+        schema:
+          description: Key of the project to build report for
+          type: string
+        style: form
+      - description: Key of the branch to build report for
+        explode: true
+        in: query
+        name: branchKey
+        required: false
+        schema:
+          description: Key of the branch to build report for
+          type: string
+        style: form
+      - description: |
+          Type of report to generate.
+          The `Accept` header sent by the client determines the format of the report.
+          Currently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),
+          spdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)
+        explode: true
+        in: query
+        name: type
+        required: true
+        schema:
+          description: |
+            Type of report to generate.
+            The `Accept` header sent by the client determines the format of the report.
+            Currently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),
+            spdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)
+          enum:
+          - cyclonedx
+          - spdx_23
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/vnd.cyclonedx+json:
+              schema:
+                type: string
+            application/vnd.cyclonedx+xml:
+              schema:
+                type: string
+            application/spdx+json:
+              schema:
+                type: string
+            application/spdx+xml:
+              schema:
+                type: string
+          description: The desired report in the desired output format
+      summary: Get a software bill of materials (SBOM) report
+      tags:
+      - i
+      x-sonar-internal: "true"
+  /v2/analysis/version:
+    get:
+      description: Get the version of the Scanner Engine
+      operationId: getVersion
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: OK
+      summary: Server version
+      tags:
+      - default-version-controller
+  /v2/dop-translation/dop-settings:
+    get:
+      description: 'Requires the ''Create Projects'' permission '
+      operationId: fetchAllDopSettings
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DopSettingsRestResponse'
+          description: OK
+      summary: List all DevOps Platform Integration settings
+      tags:
+      - default-dop-settings-controller
+  /v2/fix-suggestions/ai-suggestions:
+    post:
+      description: Requires Code Viewer permission.
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FixSuggestionPostRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FixSuggestionResponse'
+          description: OK
+      summary: Suggest a fix for the given issueId
+      tags:
+      - fix-suggestion-controller
+  /v2/dop-translation/gitlab-configurations:
+    get:
+      description: |2
+          Get the list of GitLab configurations.
+          Note that a single configuration is supported at this time.
+          Requires 'Administer System' permission.
+      operationId: searchGitlabConfiguration
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabConfigurationSearchRestResponse'
+          description: OK
+      summary: Search GitLab configs
+      tags:
+      - default-gitlab-configuration-controller
+      x-sonar-internal: "true"
+    post:
+      description: |2
+          Create a new Gitlab configuration.
+          Note that only a single configuration can exist at a time.
+          Requires 'Administer System' permission.
+      operationId: create_3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GitlabConfigurationCreateRestRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitlabConfigurationResource'
+          description: OK
+      summary: Create Gitlab configuration
+      tags:
+      - default-gitlab-configuration-controller
+      x-sonar-internal: "true"
+  /v2/sca/releases/{key}:
+    get:
+      description: |
+        Fetch a single release by its key.
+
+        This single-release endpoint lists full details for all dependencies
+        that mention the release.
 
         In the terminology of this endpoint, a "release" is a version of
         a package like "lodash 1.2.3", and a "dependency" is a specific file
@@ -1818,133 +2076,91 @@ paths:
         Each returned release may have multiple dependencies.
 
         This is an internal API and is subject to change without notice.
-      operationId: search_3
+      operationId: fetchRelease
       parameters:
-      - description: Key of the project to fetch all dependencies from
-        explode: true
-        in: query
-        name: projectKey
+      - description: The key of the release to fetch.
+        explode: false
+        in: path
+        name: key
         required: true
         schema:
-          description: Key of the project to fetch all dependencies from
           type: string
-        style: form
-      - description: "Key of the Branch to fetch all dependencies from. If not provided,\
-          \ the default branch will be used unless a Pull Request Key is provided."
-        explode: true
-        in: query
-        name: branchKey
-        required: false
-        schema:
-          description: "Key of the Branch to fetch all dependencies from. If not provided,\
-            \ the default branch will be used unless a Pull Request Key is provided."
-          type: string
-        style: form
-      - description: Key of the Pull Request to fetch all dependencies from.
-        explode: true
-        in: query
-        name: pullRequestKey
-        required: false
-        schema:
-          description: Key of the Pull Request to fetch all dependencies from.
-          type: string
-        style: form
-      - description: "Filter on the direct attribute. TRUE stands for direct dependencies,\
-          \ FALSE for transitive dependencies."
-        explode: true
-        in: query
-        name: direct
-        required: false
-        schema:
-          description: "Filter on the direct attribute. TRUE stands for direct dependencies,\
-            \ FALSE for transitive dependencies."
-          type: boolean
-        style: form
-      - description: "Filter on the newInPullRequest attribute. TRUE stands for only\
-          \ releases introduced vs. the target branch, FALSE for releases shared with\
-          \ target."
-        explode: true
-        in: query
-        name: newInPullRequest
-        required: false
-        schema:
-          description: "Filter on the newInPullRequest attribute. TRUE stands for\
-            \ only releases introduced vs. the target branch, FALSE for releases shared\
-            \ with target."
-          type: boolean
-        style: form
-      - description: "Filter on the productionScope attribute. TRUE stands for only\
-          \ production dependencies, FALSE for only not in production. If a release\
-          \ is both, it matches both."
-        explode: true
-        in: query
-        name: productionScope
-        required: false
-        schema:
-          description: "Filter on the productionScope attribute. TRUE stands for only\
-            \ production dependencies, FALSE for only not in production. If a release\
-            \ is both, it matches both."
-          type: boolean
-        style: form
-      - explode: true
-        in: query
-        name: packageManagers
-        required: false
-        schema:
-          description: Filter on the package manager
-          items:
-            type: string
-          type: array
-          uniqueItems: true
-        style: form
-      - description: Filter on the package name. This parameter performs a partial
-          match (contains and case insensitive) on the package name.
-        explode: true
-        in: query
-        name: q
-        required: false
-        schema:
-          description: Filter on the package name. This parameter performs a partial
-            match (contains and case insensitive) on the package name.
-          type: string
-        style: form
-      - description: Number of results per page. A value of 0 will only return the
-          pagination information.
-        explode: true
-        in: query
-        name: pageSize
-        required: false
-        schema:
-          default: 50
-          description: Number of results per page. A value of 0 will only return the
-            pagination information.
-          format: int32
-          maximum: 500
-          minimum: 0
-          type: integer
-        style: form
-      - description: 1-based page index
-        explode: true
-        in: query
-        name: pageIndex
-        required: false
-        schema:
-          default: 1
-          description: 1-based page index
-          format: int32
-          minimum: 1
-          type: integer
-        style: form
+        style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReleasesSearchRestResponse'
+                $ref: '#/components/schemas/ReleaseDetailResource'
           description: OK
-      summary: Search for releases
+      summary: Get a single release
       tags:
-      - a
+      - i
+      x-sonar-internal: "true"
+  /v2/clean-code-policy/mode:
+    get:
+      description: |
+        Fetch the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.
+      operationId: getMode
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeResource'
+          description: OK
+      summary: Retrieve current instance Mode
+      tags:
+      - default-mode-controller
+      x-sonar-internal: "true"
+    patch:
+      description: |
+        Update the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.
+        Requires 'Administer System' permission.
+      operationId: patchMode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModeResource'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeResource'
+          description: OK
+      summary: Update current instance Mode
+      tags:
+      - default-mode-controller
+      x-sonar-internal: "true"
+  /v2/sca/issues-releases/{key}:
+    get:
+      description: |
+        Fetch a single (issue,release) pair (dependency risk), using the key from the search endpoint.
+
+        This is an internal API and is subject to change without notice.
+      operationId: fetchIssueRelease
+      parameters:
+      - description: "The key of the issue,release pair to fetch."
+        explode: false
+        in: path
+        name: key
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueReleaseDetailsResource'
+          description: OK
+      summary: Get a single issue-release pair
+      tags:
+      - i
       x-sonar-internal: "true"
   /v2/authorizations/group-memberships:
     get:
@@ -2030,224 +2246,6 @@ paths:
       summary: Add a group membership
       tags:
       - default-group-membership-controller
-  /v2/dop-translation/gitlab-configurations/{id}:
-    delete:
-      description: |
-        Delete a GitLab configuration.
-        Requires 'Administer System' permission.
-      operationId: deleteGitlabConfiguration
-      parameters:
-      - description: The id of the configuration to delete.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: No Content
-      summary: Delete a GitLab configuration
-      tags:
-      - default-gitlab-configuration-controller
-      x-sonar-internal: "true"
-    get:
-      description: |
-        Fetch a GitLab configuration. Requires 'Administer System' permission.
-      operationId: getGitlabConfiguration
-      parameters:
-      - description: The id of the configuration to fetch.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabConfigurationResource'
-          description: OK
-      summary: Fetch a GitLab configuration
-      tags:
-      - default-gitlab-configuration-controller
-      x-sonar-internal: "true"
-    patch:
-      description: |
-        Update a Gitlab configuration. Requires 'Administer System' permission.
-      operationId: updateGitlabConfiguration
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/GitlabConfigurationUpdateRestRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabConfigurationResource'
-          description: OK
-      summary: Update a Gitlab configuration
-      tags:
-      - default-gitlab-configuration-controller
-      x-sonar-internal: "true"
-  /v2/system/liveness:
-    get:
-      description: |2
-          Require 'Administer System' permission or authentication with passcode.
-
-          When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.
-
-          When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity
-      operationId: livenessCheck
-      parameters:
-      - description: "Passcode can be provided, see SonarQube documentation"
-        explode: false
-        in: header
-        name: X-Sonar-Passcode
-        required: false
-        schema:
-          type: string
-        style: simple
-      responses:
-        default:
-          description: This SonarQube node is not alive and should be rescheduled
-        "204":
-          description: This SonarQube node is alive
-      summary: "Provide liveness of SonarQube, meant to be used as a liveness probe\
-        \ on Kubernetes"
-      tags:
-      - default-liveness-controller
-  /v2/system/email-configurations/{id}:
-    delete:
-      description: |
-        Delete an email configuration.
-        Requires 'Administer System' permission.
-      operationId: deleteEmailConfiguration
-      parameters:
-      - description: The id of the configuration to delete.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: No Content
-      summary: Delete an email configuration
-      tags:
-      - default-email-configuration-controller
-      x-sonar-internal: "true"
-    get:
-      description: |
-        Fetch a Email configuration. Requires 'Administer System' permission.
-      operationId: getEmailConfiguration
-      parameters:
-      - description: The id of the configuration to fetch.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmailConfigurationResource'
-          description: OK
-      summary: Fetch an email configuration
-      tags:
-      - default-email-configuration-controller
-      x-sonar-internal: "true"
-    patch:
-      description: |
-        Update an email configuration. Requires 'Administer System' permission.
-      operationId: updateEmailConfiguration
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/merge-patch+json:
-            schema:
-              $ref: '#/components/schemas/EmailConfigurationUpdateRestRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmailConfigurationResource'
-          description: OK
-      summary: Update an email configuration
-      tags:
-      - default-email-configuration-controller
-      x-sonar-internal: "true"
-  /v2/dop-translation/gitlab-configurations:
-    get:
-      description: |2
-          Get the list of GitLab configurations.
-          Note that a single configuration is supported at this time.
-          Requires 'Administer System' permission.
-      operationId: searchGitlabConfiguration
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabConfigurationSearchRestResponse'
-          description: OK
-      summary: Search GitLab configs
-      tags:
-      - default-gitlab-configuration-controller
-      x-sonar-internal: "true"
-    post:
-      description: |2
-          Create a new Gitlab configuration.
-          Note that only a single configuration can exist at a time.
-          Requires 'Administer System' permission.
-      operationId: create_3
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GitlabConfigurationCreateRestRequest'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GitlabConfigurationResource'
-          description: OK
-      summary: Create Gitlab configuration
-      tags:
-      - default-gitlab-configuration-controller
-      x-sonar-internal: "true"
   /api/alm_integrations/import_azure_project:
     description: Manage DevOps Platform Integrations
     post:
@@ -6495,9 +6493,9 @@ paths:
         style: form
       - allowEmptyValue: true
         description: "Comma-separated list of metric keys. Types DISTRIB are not allowed.\
-          \ For type DATA only new_maintainability_issues, reliability_issues, maintainability_issues,\
-          \ security_issues, new_reliability_issues, new_security_issues metrics are\
-          \ supported"
+          \ For type DATA only security_issues, maintainability_issues, reliability_issues,\
+          \ new_maintainability_issues, new_security_issues, new_reliability_issues\
+          \ metrics are supported"
         explode: true
         in: query
         name: metricKeys
@@ -9677,7 +9675,7 @@ paths:
       - allowEmptyValue: true
         description: Condition metric.<br/> Only metric of the following types are
           allowed:<ul><li>INT</li><li>MILLISEC</li><li>RATING</li><li>WORK_DUR</li><li>FLOAT</li><li>PERCENT</li><li>LEVEL</li></ul>Following
-          metrics are forbidden:<ul><li>alert_status</li><li>new_security_hotspots</li><li>security_hotspots</li></ul>
+          metrics are forbidden:<ul><li>alert_status</li><li>security_hotspots</li><li>new_security_hotspots</li></ul>
         explode: true
         in: query
         name: metric
@@ -10309,7 +10307,7 @@ paths:
       - allowEmptyValue: true
         description: Condition metric.<br/> Only metric of the following types are
           allowed:<ul><li>INT</li><li>MILLISEC</li><li>RATING</li><li>WORK_DUR</li><li>FLOAT</li><li>PERCENT</li><li>LEVEL</li></ul>Following
-          metrics are forbidden:<ul><li>alert_status</li><li>new_security_hotspots</li><li>security_hotspots</li></ul>
+          metrics are forbidden:<ul><li>alert_status</li><li>security_hotspots</li><li>new_security_hotspots</li></ul>
         explode: true
         in: query
         name: metric
@@ -16101,7 +16099,7 @@ components:
           type: boolean
         knownPackage:
           type: boolean
-        newInPullRequest:
+        newlyIntroduced:
           type: boolean
         directSummary:
           type: boolean
@@ -16156,7 +16154,7 @@ components:
               type: string
             type: array
           type: array
-        newInPullRequest:
+        newlyIntroduced:
           type: boolean
     IssueResource:
       properties:
@@ -16196,7 +16194,7 @@ components:
           type: boolean
         knownPackage:
           type: boolean
-        newInPullRequest:
+        newlyIntroduced:
           type: boolean
         directSummary:
           type: boolean
@@ -16632,13 +16630,13 @@ components:
       - $ref: '#/components/schemas/ScaCliInfoRestResponse'
       - format: binary
         type: string
-    downloadScannerEngine_200_response:
-      oneOf:
-      - $ref: '#/components/schemas/EngineInfoRestResponse'
-      - format: binary
-        type: string
     downloadJre_200_response:
       oneOf:
       - $ref: '#/components/schemas/JreInfoRestResponse'
+      - format: binary
+        type: string
+    downloadScannerEngine_200_response:
+      oneOf:
+      - $ref: '#/components/schemas/EngineInfoRestResponse'
       - format: binary
         type: string
