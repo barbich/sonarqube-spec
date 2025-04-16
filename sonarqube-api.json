@@ -3,7 +3,7 @@
  "info": {
   "title": "SonarQube Web API v2",
   "description": "The SonarQube API v2 is a REST API which enables you to interact with SonarQube programmatically. Endpoint listed here should work as expected.\nHowever, you should not consider the API stable for now as it is still under development. New releases of SonarQube can bring changes to existing endpoint definitions.\n",
-  "version": "2025.3.0.106218"
+  "version": "2025.3.0.106350"
  },
  "servers": [
   {
@@ -12,36 +12,19 @@
   }
  ],
  "paths": {
-  "/v2/architecture/file-graph": {
+  "/v2/sca/clis/{id}": {
    "get": {
     "tags": [
-     "i"
+     "n"
     ],
-    "summary": "Find the file graph for this project branch and source.",
-    "operationId": "弡",
+    "summary": "Get metadata for a specific CLI download",
+    "description": "Gets the metadata for a specific SCA CLI download. The response includes the\nfilename, SHA-256 checksum, operating system, and CPU architecture.\n\nThis is an internal API and is subject to change without notice.\n",
+    "operationId": "downloadScaCli",
     "parameters": [
      {
-      "name": "projectKey",
-      "in": "query",
-      "description": "The key of the project.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     },
-     {
-      "name": "branchKey",
-      "in": "query",
-      "description": "The key of the branch.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     },
-     {
-      "name": "source",
-      "in": "query",
-      "description": "The source that produced this graph. eg. java, python, js, etc.",
+      "name": "id",
+      "in": "path",
+      "description": "The ID of the SCA CLI download",
       "required": true,
       "schema": {
        "type": "string"
@@ -52,44 +35,36 @@
      "200": {
       "description": "OK",
       "content": {
+       "application/octet-stream": {
+        "schema": {
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/ScaCliInfoRestResponse"
+          },
+          {
+           "type": "string",
+           "format": "binary"
+          }
+         ]
+        }
+       },
        "application/json": {
         "schema": {
-         "type": "string"
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/ScaCliInfoRestResponse"
+          },
+          {
+           "type": "string",
+           "format": "binary"
+          }
+         ]
         }
        }
       }
      }
     },
     "x-sonar-internal": "true"
-   }
-  },
-  "/v2/system/liveness": {
-   "get": {
-    "tags": [
-     "default-liveness-controller"
-    ],
-    "summary": "Provide liveness of SonarQube, meant to be used as a liveness probe on Kubernetes",
-    "description": "  Require 'Administer System' permission or authentication with passcode.\n\n  When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.\n\n  When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity\n",
-    "operationId": "livenessCheck",
-    "parameters": [
-     {
-      "name": "X-Sonar-Passcode",
-      "in": "header",
-      "description": "Passcode can be provided, see SonarQube documentation",
-      "required": false,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "default": {
-      "description": "This SonarQube node is not alive and should be rescheduled"
-     },
-     "204": {
-      "description": "This SonarQube node is alive"
-     }
-    }
    }
   },
   "/v2/authorizations/groups/{id}": {
@@ -189,342 +164,96 @@
     }
    }
   },
-  "/v2/fix-suggestions/issues/{issueId}": {
+  "/v2/sca/releases": {
    "get": {
     "tags": [
-     "fix-suggestion-issue-controller"
+     "n"
     ],
-    "summary": "Fetch AI suggestion availability for the given issueId",
-    "description": "Requires Code Viewer permission.",
-    "operationId": "get_1",
+    "summary": "Search for releases",
+    "description": "Search for package releases that appear in the analyzed project,\nas determined by software composition analysis.\n\nThis endpoint returns one result for each release,\nrather than one result for each time a release is pulled in.\nEach result may appear in multiple files or scopes that\nall use the same version of the affected package.\n\nThe search results do not include full details on the dependencies\nthat pull in each release, only a summary. To get the full dependency\ndetails, use the /releases/{key} endpoint for a single release.\n\nIn the terminology of this endpoint, a \"release\" is a version of\na package like \"lodash 1.2.3\", and a \"dependency\" is a specific file\nand scope that pulls in the release such as \"subproject/pom.xml test\".\nEach returned release may have multiple dependencies.\n\nThis is an internal API and is subject to change without notice.\n",
+    "operationId": "search_3",
     "parameters": [
      {
-      "name": "issueId",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/FixSuggestionIssueResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/system/email-configurations/{id}": {
-   "get": {
-    "tags": [
-     "default-email-configuration-controller"
-    ],
-    "summary": "Fetch an email configuration",
-    "description": "Fetch a Email configuration. Requires 'Administer System' permission.\n",
-    "operationId": "getEmailConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the configuration to fetch.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/EmailConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "delete": {
-    "tags": [
-     "default-email-configuration-controller"
-    ],
-    "summary": "Delete an email configuration",
-    "description": "Delete an email configuration.\nRequires 'Administer System' permission.\n",
-    "operationId": "deleteEmailConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the configuration to delete.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "204": {
-      "description": "No Content"
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "patch": {
-    "tags": [
-     "default-email-configuration-controller"
-    ],
-    "summary": "Update an email configuration",
-    "description": "Update an email configuration. Requires 'Administer System' permission.\n",
-    "operationId": "updateEmailConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/EmailConfigurationUpdateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/EmailConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/dop-translation/gitlab-synchronization-runs": {
-   "post": {
-    "tags": [
-     "gitlab-synchronization-run-controller"
-    ],
-    "summary": "Starts a GitLab synchronization run.",
-    "description": "  Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.\n",
-    "operationId": "create_2",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GitlabSynchronizationRunResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/dop-translation/github-configurations/{id}": {
-   "get": {
-    "tags": [
-     "default-github-configuration-controller"
-    ],
-    "summary": "Fetch a GitHub configuration",
-    "description": "Fetch a GitHub configuration. Requires 'Administer System' permission.\n",
-    "operationId": "getGithubConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the configuration to fetch.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GithubConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "delete": {
-    "tags": [
-     "default-github-configuration-controller"
-    ],
-    "summary": "Delete a GitHub configuration",
-    "description": "Delete a GitHub configuration.\nRequires 'Administer System' permission.\n",
-    "operationId": "deleteGithubConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the configuration to delete.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "204": {
-      "description": "No Content"
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "patch": {
-    "tags": [
-     "default-github-configuration-controller"
-    ],
-    "summary": "Update a GitHub configuration",
-    "description": "Update a GitHub configuration. Requires 'Administer System' permission.\n",
-    "operationId": "updateGithubConfiguration",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/GithubConfigurationUpdateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/GithubConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/system/email-configurations": {
-   "get": {
-    "tags": [
-     "default-email-configuration-controller"
-    ],
-    "summary": "Search email configurations",
-    "description": "  Get the list of email configurations.\n  Note that a single configuration is supported at this time.\n  Requires 'Administer System' permission.\n",
-    "operationId": "searchEmailConfigurations",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/EmailConfigurationSearchRestResponse"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "post": {
-    "tags": [
-     "default-email-configuration-controller"
-    ],
-    "summary": "Create an email configuration",
-    "description": "  Create a new email configuration.\n  Note that only a single configuration can exist at a time.\n  Requires 'Administer System' permission.\n",
-    "operationId": "createEmailConfiguration",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/EmailConfigurationCreateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/EmailConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/authorizations/groups": {
-   "get": {
-    "tags": [
-     "default-group-controller"
-    ],
-    "summary": "Group search",
-    "description": "  Get the list of groups.\n  The results are sorted alphabetically by group name.\n",
-    "operationId": "search_1",
-    "parameters": [
-     {
-      "name": "managed",
+      "name": "projectKey",
       "in": "query",
-      "description": "Return managed or non-managed groups. Only available for managed instances, throws for non-managed instances",
+      "description": "Key of the project to fetch all dependencies from",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "description": "Key of the project to fetch all dependencies from"
+      }
+     },
+     {
+      "name": "branchKey",
+      "in": "query",
+      "description": "Key of the Branch to fetch all dependencies from. If not provided, the default branch will be used unless a Pull Request Key is provided.",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "Key of the Branch to fetch all dependencies from. If not provided, the default branch will be used unless a Pull Request Key is provided."
+      }
+     },
+     {
+      "name": "pullRequestKey",
+      "in": "query",
+      "description": "Key of the Pull Request to fetch all dependencies from.",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "Key of the Pull Request to fetch all dependencies from."
+      }
+     },
+     {
+      "name": "direct",
+      "in": "query",
+      "description": "Filter on the direct attribute. TRUE stands for direct dependencies, FALSE for transitive dependencies.",
       "required": false,
       "schema": {
        "type": "boolean",
-       "description": "Return managed or non-managed groups. Only available for managed instances, throws for non-managed instances"
+       "description": "Filter on the direct attribute. TRUE stands for direct dependencies, FALSE for transitive dependencies."
+      }
+     },
+     {
+      "name": "newlyIntroduced",
+      "in": "query",
+      "description": "Filter on the newlyIntroduced attribute. TRUE stands for only releases introduced vs. the target branch, FALSE for releases shared with target.",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "description": "Filter on the newlyIntroduced attribute. TRUE stands for only releases introduced vs. the target branch, FALSE for releases shared with target."
+      }
+     },
+     {
+      "name": "productionScope",
+      "in": "query",
+      "description": "Filter on the productionScope attribute. TRUE stands for only production dependencies, FALSE for only not in production. If a release is both, it matches both.",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "description": "Filter on the productionScope attribute. TRUE stands for only production dependencies, FALSE for only not in production. If a release is both, it matches both."
+      }
+     },
+     {
+      "name": "packageManagers",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "uniqueItems": true,
+       "description": "Filter on the package manager"
       }
      },
      {
       "name": "q",
       "in": "query",
-      "description": "Filter on name.\nThis parameter performs a partial match (contains), it is case insensitive.",
+      "description": "Filter on the package name. This parameter performs a partial match (contains and case insensitive) on the package name.",
       "required": false,
       "schema": {
        "type": "string",
-       "description": "Filter on name.\nThis parameter performs a partial match (contains), it is case insensitive."
+       "description": "Filter on the package name. This parameter performs a partial match (contains and case insensitive) on the package name."
       }
      },
      {
@@ -561,7 +290,162 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/GroupsSearchRestResponse"
+         "$ref": "#/components/schemas/ReleasesSearchRestResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/system/liveness": {
+   "get": {
+    "tags": [
+     "default-liveness-controller"
+    ],
+    "summary": "Provide liveness of SonarQube, meant to be used as a liveness probe on Kubernetes",
+    "description": "  Require 'Administer System' permission or authentication with passcode.\n\n  When SonarQube is fully started, liveness check for database connectivity, Compute Engine status, and, except for DataCenter Edition, if ElasticSearch is Green or Yellow.\n\n  When SonarQube is on Safe Mode (for example when a database migration is running), liveness check only for database connectivity\n",
+    "operationId": "livenessCheck",
+    "parameters": [
+     {
+      "name": "X-Sonar-Passcode",
+      "in": "header",
+      "description": "Passcode can be provided, see SonarQube documentation",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "default": {
+      "description": "This SonarQube node is not alive and should be rescheduled"
+     },
+     "204": {
+      "description": "This SonarQube node is alive"
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/github-permission-mappings": {
+   "get": {
+    "tags": [
+     "github-permission-mappings-controller"
+    ],
+    "summary": "Fetch permissions mapping",
+    "description": "Get the list of all the existing roles with their permission mappings. Requires 'Administer System' permission.",
+    "operationId": "fetchAll_1",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PermissionMappingsSearchRestResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "post": {
+    "tags": [
+     "github-permission-mappings-controller"
+    ],
+    "summary": "Create a permission mapping for a custom role",
+    "description": "Requires 'Administer System' permission.",
+    "operationId": "createMapping_1",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PermissionMappingsPostRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PermissionMappingsResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/authorizations/group-memberships": {
+   "get": {
+    "tags": [
+     "default-group-membership-controller"
+    ],
+    "summary": "Search across group memberships",
+    "description": "  Get the list of groups and members matching the query.\n",
+    "operationId": "search_2",
+    "parameters": [
+     {
+      "name": "userId",
+      "in": "query",
+      "description": "ID of the user for which to search groups. If not set, all groups are returned.",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "ID of the user for which to search groups. If not set, all groups are returned."
+      }
+     },
+     {
+      "name": "groupId",
+      "in": "query",
+      "description": "ID of the group for which to search members. If not set, all groups are returned.",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "ID of the group for which to search members. If not set, all groups are returned."
+      }
+     },
+     {
+      "name": "pageSize",
+      "in": "query",
+      "description": "Number of results per page. A value of 0 will only return the pagination information.",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 500,
+       "minimum": 0,
+       "format": "int32",
+       "description": "Number of results per page. A value of 0 will only return the pagination information.",
+       "default": 50
+      }
+     },
+     {
+      "name": "pageIndex",
+      "in": "query",
+      "description": "1-based page index",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "format": "int32",
+       "description": "1-based page index",
+       "default": 1
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GroupsMembershipSearchRestResponse"
         }
        }
       }
@@ -570,16 +454,16 @@
    },
    "post": {
     "tags": [
-     "default-group-controller"
+     "default-group-membership-controller"
     ],
-    "summary": "Create a new group",
-    "description": "Create a new group.",
-    "operationId": "create_5",
+    "summary": "Add a group membership",
+    "description": "Add a user to a group.",
+    "operationId": "create_6",
     "requestBody": {
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/GroupCreateRestRequest"
+        "$ref": "#/components/schemas/GroupMembershipCreateRestRequest"
        }
       }
      },
@@ -591,7 +475,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/GroupRestResponse"
+         "$ref": "#/components/schemas/GroupMembershipRestResponse"
         }
        }
       }
@@ -599,71 +483,19 @@
     }
    }
   },
-  "/v2/system/migrations-status": {
+  "/v2/sca/releases/{key}": {
    "get": {
     "tags": [
-     "database-migrations-controller"
+     "n"
     ],
-    "summary": "Gets the status of ongoing database migrations, if any",
-    "description": "Return the detailed status of ongoing database migrations including starting date. If no migration is ongoing or needed it is still possible to call this endpoint and receive appropriate information.",
-    "operationId": "getStatus",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/DatabaseMigrationsResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/system/health": {
-   "get": {
-    "tags": [
-     "health-controller"
-    ],
-    "operationId": "getHealth",
+    "summary": "Get a single release",
+    "description": "Fetch a single release by its key.\n\nThis single-release endpoint lists full details for all dependencies\nthat mention the release.\n\nIn the terminology of this endpoint, a \"release\" is a version of\na package like \"lodash 1.2.3\", and a \"dependency\" is a specific file\nand scope that pulls in the release such as \"subproject/pom.xml test\".\nEach returned release may have multiple dependencies.\n\nThis is an internal API and is subject to change without notice.\n",
+    "operationId": "fetchRelease",
     "parameters": [
      {
-      "name": "X-Sonar-Passcode",
-      "in": "header",
-      "required": false,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/Health"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/sca/clis/{id}": {
-   "get": {
-    "tags": [
-     "i"
-    ],
-    "summary": "Get metadata for a specific CLI download",
-    "description": "Gets the metadata for a specific SCA CLI download. The response includes the\nfilename, SHA-256 checksum, operating system, and CPU architecture.\n\nThis is an internal API and is subject to change without notice.\n",
-    "operationId": "downloadScaCli",
-    "parameters": [
-     {
-      "name": "id",
+      "name": "key",
       "in": "path",
-      "description": "The ID of the SCA CLI download",
+      "description": "The key of the release to fetch.",
       "required": true,
       "schema": {
        "type": "string"
@@ -674,11 +506,34 @@
      "200": {
       "description": "OK",
       "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ReleaseDetailResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/analysis/engine": {
+   "get": {
+    "tags": [
+     "default-scanner-engine-controller"
+    ],
+    "summary": "Scanner engine download/metadata",
+    "description": "This endpoint return the Scanner Engine metadata by default. To download the Scanner Engine, set the Accept header of the request to 'application/octet-stream'.",
+    "operationId": "downloadScannerEngine",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
        "application/octet-stream": {
         "schema": {
          "oneOf": [
           {
-           "$ref": "#/components/schemas/ScaCliInfoRestResponse"
+           "$ref": "#/components/schemas/EngineInfoRestResponse"
           },
           {
            "type": "string",
@@ -691,7 +546,7 @@
         "schema": {
          "oneOf": [
           {
-           "$ref": "#/components/schemas/ScaCliInfoRestResponse"
+           "$ref": "#/components/schemas/EngineInfoRestResponse"
           },
           {
            "type": "string",
@@ -702,8 +557,7 @@
        }
       }
      }
-    },
-    "x-sonar-internal": "true"
+    }
    }
   },
   "/v2/users-management/users": {
@@ -886,105 +740,20 @@
     }
    }
   },
-  "/v2/sca/clis": {
+  "/v2/fix-suggestions/service-info": {
    "get": {
     "tags": [
-     "i"
+     "service-info-controller"
     ],
-    "summary": "Get available CLI downloads",
-    "description": "Gets the available SCA CLI downloads. The response includes metadata about each option\nsuch as the filename and operating system.\n\nThis is an internal API and is subject to change without notice.\n",
-    "operationId": "getScaClisMetadata",
-    "parameters": [
-     {
-      "name": "os",
-      "in": "query",
-      "description": "Filter by operating system",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "enum": [
-        "windows",
-        "linux",
-        "macos"
-       ],
-       "description": "Filter by operating system",
-       "example": "windows"
-      },
-      "example": "windows"
-     },
-     {
-      "name": "arch",
-      "in": "query",
-      "description": "Filter by CPU architecture",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "enum": [
-        "x64",
-        "aarch64"
-       ],
-       "description": "Filter by CPU architecture",
-       "example": "x64"
-      },
-      "example": "x64"
-     }
-    ],
+    "summary": "Request status and subscription information of AI CodeFix service",
+    "operationId": "get",
     "responses": {
      "200": {
       "description": "OK",
       "content": {
        "application/json": {
         "schema": {
-         "type": "array",
-         "items": {
-          "$ref": "#/components/schemas/ScaCliInfoRestResponse"
-         }
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/analysis/jres": {
-   "get": {
-    "tags": [
-     "default-jres-controller"
-    ],
-    "summary": "All JREs metadata",
-    "description": "Get metadata of all available JREs",
-    "operationId": "getJresMetadata",
-    "parameters": [
-     {
-      "name": "os",
-      "in": "query",
-      "description": "Filter the JRE by operating system. Accepted values are 'windows', 'linux', 'macos', 'alpine' (case-insensitive), with some aliases",
-      "required": false,
-      "schema": {
-       "type": "string"
-      }
-     },
-     {
-      "name": "arch",
-      "in": "query",
-      "description": "Filter the JRE by CPU architecture. Accepted values are 'x64' and 'aarch64' (case-insensitive), with some aliases.",
-      "required": false,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "type": "array",
-         "items": {
-          "$ref": "#/components/schemas/JreInfoRestResponse"
-         }
+         "$ref": "#/components/schemas/ServiceInfo"
         }
        }
       }
@@ -992,21 +761,55 @@
     }
    }
   },
-  "/v2/dop-translation/gitlab-permission-mappings": {
+  "/v2/sca/issues-releases/{key}": {
    "get": {
     "tags": [
-     "gitlab-permission-mappings-controller"
+     "n"
     ],
-    "summary": "Fetch permissions mapping",
-    "description": "Get the list of all the existing roles with their permission mappings. Requires 'Administer System' permission.",
-    "operationId": "fetchAll",
+    "summary": "Get a single issue-release pair",
+    "description": "Fetch a single (issue,release) pair (dependency risk), using the key from the search endpoint.\n\nThis is an internal API and is subject to change without notice.\n",
+    "operationId": "fetchIssueRelease",
+    "parameters": [
+     {
+      "name": "key",
+      "in": "path",
+      "description": "The key of the issue,release pair to fetch.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
     "responses": {
      "200": {
       "description": "OK",
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/PermissionMappingsSearchRestResponse"
+         "$ref": "#/components/schemas/IssueReleaseDetailsResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/system/email-configurations": {
+   "get": {
+    "tags": [
+     "default-email-configuration-controller"
+    ],
+    "summary": "Search email configurations",
+    "description": "  Get the list of email configurations.\n  Note that a single configuration is supported at this time.\n  Requires 'Administer System' permission.\n",
+    "operationId": "searchEmailConfigurations",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EmailConfigurationSearchRestResponse"
         }
        }
       }
@@ -1016,16 +819,16 @@
    },
    "post": {
     "tags": [
-     "gitlab-permission-mappings-controller"
+     "default-email-configuration-controller"
     ],
-    "summary": "Create a permission mapping for a custom role",
-    "description": "Requires 'Administer System' permission.",
-    "operationId": "createMapping",
+    "summary": "Create an email configuration",
+    "description": "  Create a new email configuration.\n  Note that only a single configuration can exist at a time.\n  Requires 'Administer System' permission.\n",
+    "operationId": "createEmailConfiguration",
     "requestBody": {
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/PermissionMappingsPostRequest"
+        "$ref": "#/components/schemas/EmailConfigurationCreateRestRequest"
        }
       }
      },
@@ -1037,7 +840,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/PermissionMappingsResource"
+         "$ref": "#/components/schemas/EmailConfigurationResource"
         }
        }
       }
@@ -1046,19 +849,17 @@
     "x-sonar-internal": "true"
    }
   },
-  "/v2/dop-translation/project-bindings/{id}": {
+  "/v2/system/health": {
    "get": {
     "tags": [
-     "default-project-bindings-controller"
+     "health-controller"
     ],
-    "summary": "Fetch a single Project Binding",
-    "operationId": "getProjectBinding",
+    "operationId": "getHealth",
     "parameters": [
      {
-      "name": "id",
-      "in": "path",
-      "description": "The id of the project-bindings to fetch.",
-      "required": true,
+      "name": "X-Sonar-Passcode",
+      "in": "header",
+      "required": false,
       "schema": {
        "type": "string"
       }
@@ -1070,194 +871,18 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ProjectBinding"
+         "$ref": "#/components/schemas/Health"
         }
        }
       }
      }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/dop-translation/github-permission-mappings": {
-   "get": {
-    "tags": [
-     "github-permission-mappings-controller"
-    ],
-    "summary": "Fetch permissions mapping",
-    "description": "Get the list of all the existing roles with their permission mappings. Requires 'Administer System' permission.",
-    "operationId": "fetchAll_1",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/PermissionMappingsSearchRestResponse"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "post": {
-    "tags": [
-     "github-permission-mappings-controller"
-    ],
-    "summary": "Create a permission mapping for a custom role",
-    "description": "Requires 'Administer System' permission.",
-    "operationId": "createMapping_1",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/PermissionMappingsPostRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/PermissionMappingsResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/sca/feature-enablements": {
-   "get": {
-    "tags": [
-     "i"
-    ],
-    "summary": "Get the status of SCA enablement",
-    "operationId": "getFeatureEnablement",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/FeatureEnablementResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "patch": {
-    "tags": [
-     "i"
-    ],
-    "summary": "Update SCA enablement settings",
-    "operationId": "updateFeatureEnablement",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/FeatureEnablementRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/FeatureEnablementResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/dop-translation/github-permission-mappings/{role}": {
-   "delete": {
-    "tags": [
-     "github-permission-mappings-controller"
-    ],
-    "summary": "Delete a single permission mappings",
-    "description": "Requires 'Administer System' permission.",
-    "operationId": "deleteMapping_1",
-    "parameters": [
-     {
-      "name": "role",
-      "in": "path",
-      "description": "The name of the role to delete",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "204": {
-      "description": "No Content"
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "patch": {
-    "tags": [
-     "github-permission-mappings-controller"
-    ],
-    "summary": "Update a single permission mapping",
-    "description": "Requires 'Administer System' permission.",
-    "operationId": "updateMapping_1",
-    "parameters": [
-     {
-      "name": "role",
-      "in": "path",
-      "description": "The name of the role to update",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/DevOpsPermissionMappingUpdateRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/PermissionMappingsResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
+    }
    }
   },
   "/v2/sca/issues-releases": {
    "get": {
     "tags": [
-     "i"
+     "n"
     ],
     "summary": "Search for issue-release pairs",
     "description": "Search for software composition analysis issues (dependency risks)\nof a project, paired with releases that appear in the analyzed\nproject.\n\nThis endpoint returns one result for each (issue,release) pair,\nrather than one result for each distinct issue. So for example\nif a library uses two different versions of a package and\nboth versions are affected by the same vulnerability, you will\nget two results not one.\n\nHowever each result may appear in multiple files or scopes that\nall use the same version of the affected package.\n\nIn the terminology of this endpoint, a \"release\" is a version of\na package like \"lodash 1.2.3\", an \"issue\" is a problem such as\n\"CVE-1234\", and a \"dependency\" is a specific file and scope that\npulls in the release such as \"subproject/pom.xml test\".\n\nThis is an internal API and is subject to change without notice.\n",
@@ -1457,6 +1082,107 @@
     "x-sonar-internal": "true"
    }
   },
+  "/v2/dop-translation/project-bindings/{id}": {
+   "get": {
+    "tags": [
+     "default-project-bindings-controller"
+    ],
+    "summary": "Fetch a single Project Binding",
+    "operationId": "getProjectBinding",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the project-bindings to fetch.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectBinding"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/analysis/active_rules": {
+   "get": {
+    "tags": [
+     "default-active-rules-controller"
+    ],
+    "summary": "Get all active rules for a specific project",
+    "description": "Used by the scanner-engine to get all active rules for a given project.",
+    "operationId": "getActiveRules",
+    "parameters": [
+     {
+      "name": "projectKey",
+      "in": "query",
+      "description": "Project Key",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/ActiveRule"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/fix-suggestions/ai-suggestions": {
+   "post": {
+    "tags": [
+     "fix-suggestion-controller"
+    ],
+    "summary": "Suggest a fix for the given issueId",
+    "description": "Requires Code Viewer permission.",
+    "operationId": "create_1",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/FixSuggestionPostRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/FixSuggestionResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/v2/dop-translation/github-configurations": {
    "get": {
     "tags": [
@@ -1503,614 +1229,6 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/GithubConfigurationResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/analysis/active_rules": {
-   "get": {
-    "tags": [
-     "default-active-rules-controller"
-    ],
-    "summary": "Get all active rules for a specific project",
-    "description": "Used by the scanner-engine to get all active rules for a given project.",
-    "operationId": "getActiveRules",
-    "parameters": [
-     {
-      "name": "projectKey",
-      "in": "query",
-      "description": "Project Key",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "type": "array",
-         "items": {
-          "$ref": "#/components/schemas/ActiveRule"
-         }
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/analysis/jres/{id}": {
-   "get": {
-    "tags": [
-     "default-jres-controller"
-    ],
-    "summary": "JRE download/metadata",
-    "description": "This endpoint return the JRE metadata by default. To download the JRE binary asset, set the Accept header of the request to 'application/octet-stream'.",
-    "operationId": "downloadJre",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The ID of the JRE",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/octet-stream": {
-        "schema": {
-         "oneOf": [
-          {
-           "$ref": "#/components/schemas/JreInfoRestResponse"
-          },
-          {
-           "type": "string",
-           "format": "binary"
-          }
-         ]
-        }
-       },
-       "application/json": {
-        "schema": {
-         "oneOf": [
-          {
-           "$ref": "#/components/schemas/JreInfoRestResponse"
-          },
-          {
-           "type": "string",
-           "format": "binary"
-          }
-         ]
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/clean-code-policy/rules": {
-   "post": {
-    "tags": [
-     "default-rule-controller"
-    ],
-    "summary": "Custom rule creation",
-    "description": "  Create a custom rule.\n  Requires the 'Administer Quality Profiles' permission.\n",
-    "operationId": "create_4",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/RuleCreateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/RuleRestResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/authorizations/group-memberships/{id}": {
-   "delete": {
-    "tags": [
-     "default-group-membership-controller"
-    ],
-    "summary": "Remove a group membership",
-    "description": "Remove a user from a group",
-    "operationId": "delete",
-    "parameters": [
-     {
-      "name": "id",
-      "in": "path",
-      "description": "The ID of the group membership to delete.",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "204": {
-      "description": "No Content"
-     }
-    }
-   }
-  },
-  "/v2/fix-suggestions/supported-llm-providers": {
-   "get": {
-    "tags": [
-     "supported-llm-provider-controller"
-    ],
-    "summary": "Get the supported LLM providers",
-    "description": "Returns the LLM providers that could be used for requesting an AI fix suggestion",
-    "operationId": "getLlmProviders",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "type": "array",
-         "items": {
-          "$ref": "#/components/schemas/LlmProviderResponseDto"
-         }
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/fix-suggestions/service-info": {
-   "get": {
-    "tags": [
-     "service-info-controller"
-    ],
-    "summary": "Request status and subscription information of AI CodeFix service",
-    "operationId": "get",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ServiceInfo"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/analysis/engine": {
-   "get": {
-    "tags": [
-     "default-scanner-engine-controller"
-    ],
-    "summary": "Scanner engine download/metadata",
-    "description": "This endpoint return the Scanner Engine metadata by default. To download the Scanner Engine, set the Accept header of the request to 'application/octet-stream'.",
-    "operationId": "downloadScannerEngine",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/octet-stream": {
-        "schema": {
-         "oneOf": [
-          {
-           "$ref": "#/components/schemas/EngineInfoRestResponse"
-          },
-          {
-           "type": "string",
-           "format": "binary"
-          }
-         ]
-        }
-       },
-       "application/json": {
-        "schema": {
-         "oneOf": [
-          {
-           "$ref": "#/components/schemas/EngineInfoRestResponse"
-          },
-          {
-           "type": "string",
-           "format": "binary"
-          }
-         ]
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/dop-translation/gitlab-permission-mappings/{role}": {
-   "delete": {
-    "tags": [
-     "gitlab-permission-mappings-controller"
-    ],
-    "summary": "Delete a single permission mappings",
-    "description": "Requires 'Administer System' permission.",
-    "operationId": "deleteMapping",
-    "parameters": [
-     {
-      "name": "role",
-      "in": "path",
-      "description": "The name of the role to delete",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "204": {
-      "description": "No Content"
-     }
-    },
-    "x-sonar-internal": "true"
-   },
-   "patch": {
-    "tags": [
-     "gitlab-permission-mappings-controller"
-    ],
-    "summary": "Update a single permission mapping",
-    "description": "Requires 'Administer System' permission.",
-    "operationId": "updateMapping",
-    "parameters": [
-     {
-      "name": "role",
-      "in": "path",
-      "description": "The name of the role to update",
-      "required": true,
-      "schema": {
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/DevOpsPermissionMappingUpdateRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/PermissionMappingsResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/fix-suggestions/service-info/subscription-type": {
-   "get": {
-    "tags": [
-     "service-info-controller"
-    ],
-    "summary": "Request subscription information of AI CodeFix service",
-    "operationId": "getSubscriptionType",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/SubscriptionTypeResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/dop-translation/project-bindings": {
-   "get": {
-    "tags": [
-     "default-project-bindings-controller"
-    ],
-    "summary": "Search across project bindings",
-    "operationId": "getProjectBindingByProjectId",
-    "parameters": [
-     {
-      "name": "repository",
-      "in": "query",
-      "description": "Filter on the repository name.\nThis parameter performs an exact, case insensitive, match.\n",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "Filter on the repository name.\nThis parameter performs an exact, case insensitive, match.\n"
-      }
-     },
-     {
-      "name": "dopSettingId",
-      "in": "query",
-      "description": "Filter on the DevOps Platform setting id.",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "Filter on the DevOps Platform setting id."
-      }
-     },
-     {
-      "name": "pageSize",
-      "in": "query",
-      "description": "Number of results per page. A value of 0 will only return the pagination information.",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "maximum": 500,
-       "minimum": 0,
-       "format": "int32",
-       "description": "Number of results per page. A value of 0 will only return the pagination information.",
-       "default": 50
-      }
-     },
-     {
-      "name": "pageIndex",
-      "in": "query",
-      "description": "1-based page index",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "minimum": 1,
-       "format": "int32",
-       "description": "1-based page index",
-       "default": 1
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ProjectBindingsSearchRestResponse"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/dop-translation/bound-projects": {
-   "post": {
-    "tags": [
-     "default-bound-projects-controller"
-    ],
-    "summary": "Create a SonarQube project with the information from the provided DevOps platform project.",
-    "description": "Create a SonarQube project with the information from the provided DevOps platform project.\nAutoconfigure Pull-Request decoration mechanism.\nRequires the 'Create Projects' permission and setting a Personal Access Token with api/alm_integrations/set_pat for a user who will be using this endpoint\n",
-    "operationId": "createBoundProject",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/BoundProjectCreateRestRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "201": {
-      "description": "Created",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/BoundProjectCreateRestResponse"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/v2/fix-suggestions/feature-enablements": {
-   "get": {
-    "tags": [
-     "feature-enablement-controller"
-    ],
-    "summary": "Fetch the Ai CodeFix feature enablement configurations",
-    "operationId": "getFeatureEnablement_1",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/FeatureEnablementResponse"
-        }
-       }
-      }
-     }
-    }
-   },
-   "patch": {
-    "tags": [
-     "feature-enablement-controller"
-    ],
-    "summary": "Enable/Disable the AI CodeFix feature at the instance or project level",
-    "operationId": "updateFeatureEnablement_1",
-    "requestBody": {
-     "content": {
-      "application/merge-patch+json": {
-       "schema": {
-        "$ref": "#/components/schemas/FeatureEnablementRequest"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "204": {
-      "description": "No Content"
-     }
-    }
-   }
-  },
-  "/v2/sca/releases": {
-   "get": {
-    "tags": [
-     "i"
-    ],
-    "summary": "Search for releases",
-    "description": "Search for package releases that appear in the analyzed project,\nas determined by software composition analysis.\n\nThis endpoint returns one result for each release,\nrather than one result for each time a release is pulled in.\nEach result may appear in multiple files or scopes that\nall use the same version of the affected package.\n\nThe search results do not include full details on the dependencies\nthat pull in each release, only a summary. To get the full dependency\ndetails, use the /releases/{key} endpoint for a single release.\n\nIn the terminology of this endpoint, a \"release\" is a version of\na package like \"lodash 1.2.3\", and a \"dependency\" is a specific file\nand scope that pulls in the release such as \"subproject/pom.xml test\".\nEach returned release may have multiple dependencies.\n\nThis is an internal API and is subject to change without notice.\n",
-    "operationId": "search_3",
-    "parameters": [
-     {
-      "name": "projectKey",
-      "in": "query",
-      "description": "Key of the project to fetch all dependencies from",
-      "required": true,
-      "schema": {
-       "type": "string",
-       "description": "Key of the project to fetch all dependencies from"
-      }
-     },
-     {
-      "name": "branchKey",
-      "in": "query",
-      "description": "Key of the Branch to fetch all dependencies from. If not provided, the default branch will be used unless a Pull Request Key is provided.",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "Key of the Branch to fetch all dependencies from. If not provided, the default branch will be used unless a Pull Request Key is provided."
-      }
-     },
-     {
-      "name": "pullRequestKey",
-      "in": "query",
-      "description": "Key of the Pull Request to fetch all dependencies from.",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "Key of the Pull Request to fetch all dependencies from."
-      }
-     },
-     {
-      "name": "direct",
-      "in": "query",
-      "description": "Filter on the direct attribute. TRUE stands for direct dependencies, FALSE for transitive dependencies.",
-      "required": false,
-      "schema": {
-       "type": "boolean",
-       "description": "Filter on the direct attribute. TRUE stands for direct dependencies, FALSE for transitive dependencies."
-      }
-     },
-     {
-      "name": "newlyIntroduced",
-      "in": "query",
-      "description": "Filter on the newlyIntroduced attribute. TRUE stands for only releases introduced vs. the target branch, FALSE for releases shared with target.",
-      "required": false,
-      "schema": {
-       "type": "boolean",
-       "description": "Filter on the newlyIntroduced attribute. TRUE stands for only releases introduced vs. the target branch, FALSE for releases shared with target."
-      }
-     },
-     {
-      "name": "productionScope",
-      "in": "query",
-      "description": "Filter on the productionScope attribute. TRUE stands for only production dependencies, FALSE for only not in production. If a release is both, it matches both.",
-      "required": false,
-      "schema": {
-       "type": "boolean",
-       "description": "Filter on the productionScope attribute. TRUE stands for only production dependencies, FALSE for only not in production. If a release is both, it matches both."
-      }
-     },
-     {
-      "name": "packageManagers",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "array",
-       "items": {
-        "type": "string"
-       },
-       "uniqueItems": true,
-       "description": "Filter on the package manager"
-      }
-     },
-     {
-      "name": "q",
-      "in": "query",
-      "description": "Filter on the package name. This parameter performs a partial match (contains and case insensitive) on the package name.",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "Filter on the package name. This parameter performs a partial match (contains and case insensitive) on the package name."
-      }
-     },
-     {
-      "name": "pageSize",
-      "in": "query",
-      "description": "Number of results per page. A value of 0 will only return the pagination information.",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "maximum": 500,
-       "minimum": 0,
-       "format": "int32",
-       "description": "Number of results per page. A value of 0 will only return the pagination information.",
-       "default": 50
-      }
-     },
-     {
-      "name": "pageIndex",
-      "in": "query",
-      "description": "1-based page index",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "minimum": 1,
-       "format": "int32",
-       "description": "1-based page index",
-       "default": 1
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ReleasesSearchRestResponse"
         }
        }
       }
@@ -2226,6 +1344,194 @@
     }
    }
   },
+  "/v2/authorizations/groups": {
+   "get": {
+    "tags": [
+     "default-group-controller"
+    ],
+    "summary": "Group search",
+    "description": "  Get the list of groups.\n  The results are sorted alphabetically by group name.\n",
+    "operationId": "search_1",
+    "parameters": [
+     {
+      "name": "managed",
+      "in": "query",
+      "description": "Return managed or non-managed groups. Only available for managed instances, throws for non-managed instances",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "description": "Return managed or non-managed groups. Only available for managed instances, throws for non-managed instances"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "description": "Filter on name.\nThis parameter performs a partial match (contains), it is case insensitive.",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "Filter on name.\nThis parameter performs a partial match (contains), it is case insensitive."
+      }
+     },
+     {
+      "name": "pageSize",
+      "in": "query",
+      "description": "Number of results per page. A value of 0 will only return the pagination information.",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 500,
+       "minimum": 0,
+       "format": "int32",
+       "description": "Number of results per page. A value of 0 will only return the pagination information.",
+       "default": 50
+      }
+     },
+     {
+      "name": "pageIndex",
+      "in": "query",
+      "description": "1-based page index",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "format": "int32",
+       "description": "1-based page index",
+       "default": 1
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GroupsSearchRestResponse"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "default-group-controller"
+    ],
+    "summary": "Create a new group",
+    "description": "Create a new group.",
+    "operationId": "create_5",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/GroupCreateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "description": "Created",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GroupRestResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/authorizations/group-memberships/{id}": {
+   "delete": {
+    "tags": [
+     "default-group-membership-controller"
+    ],
+    "summary": "Remove a group membership",
+    "description": "Remove a user from a group",
+    "operationId": "delete",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The ID of the group membership to delete.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No Content"
+     }
+    }
+   }
+  },
+  "/v2/sca/clis": {
+   "get": {
+    "tags": [
+     "n"
+    ],
+    "summary": "Get available CLI downloads",
+    "description": "Gets the available SCA CLI downloads. The response includes metadata about each option\nsuch as the filename and operating system.\n\nThis is an internal API and is subject to change without notice.\n",
+    "operationId": "getScaClisMetadata",
+    "parameters": [
+     {
+      "name": "os",
+      "in": "query",
+      "description": "Filter by operating system",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "windows",
+        "linux",
+        "macos"
+       ],
+       "description": "Filter by operating system",
+       "example": "windows"
+      },
+      "example": "windows"
+     },
+     {
+      "name": "arch",
+      "in": "query",
+      "description": "Filter by CPU architecture",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "x64",
+        "aarch64"
+       ],
+       "description": "Filter by CPU architecture",
+       "example": "x64"
+      },
+      "example": "x64"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/ScaCliInfoRestResponse"
+         }
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
   "/v2/fix-suggestions/feature-enablements/awareness-banner-interactions": {
    "post": {
     "tags": [
@@ -2250,6 +1556,492 @@
        "application/json": {
         "schema": {
          "$ref": "#/components/schemas/AwarenessBannerClickedResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/clean-code-policy/rules": {
+   "post": {
+    "tags": [
+     "default-rule-controller"
+    ],
+    "summary": "Custom rule creation",
+    "description": "  Create a custom rule.\n  Requires the 'Administer Quality Profiles' permission.\n",
+    "operationId": "create_4",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RuleCreateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RuleRestResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/sca/sbom-reports": {
+   "get": {
+    "tags": [
+     "n"
+    ],
+    "summary": "Get a software bill of materials (SBOM) report",
+    "description": "Return a report based on the dependencies in this project's branch, using\nthe type parameter and Accept header to select the report to generate.\n\nRight now, the available reports have specialized MIME types that\ngo along with those formats:\n\n* CycloneDX: https://cyclonedx.org/specification/overview/\n  * JSON \u0026 XML\n* SPDX 2.3: https://spdx.github.io/spdx-spec/v2.3/\n  * JSON \u0026 XML\n\nTheoretically you could send just the MIME type for the format you wanted\nas the Accept header and get that report. However, there may be other\nformats that don't have a specific MIME type attached -- think two\ndifferent flavors of a CSV report, for example. In that case, we still\nneed a specific report type parameter to help differentiate more.\n\nThis is an internal API and is subject to change without notice.\n",
+    "operationId": "generateReport",
+    "parameters": [
+     {
+      "name": "projectKey",
+      "in": "query",
+      "description": "Key of the project to build report for",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "description": "Key of the project to build report for"
+      }
+     },
+     {
+      "name": "branchKey",
+      "in": "query",
+      "description": "Key of the branch to build report for",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "Key of the branch to build report for"
+      }
+     },
+     {
+      "name": "type",
+      "in": "query",
+      "description": "Type of report to generate.\nThe `Accept` header sent by the client determines the format of the report.\nCurrently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),\nspdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)\n",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "cyclonedx",
+        "spdx_23"
+       ],
+       "description": "Type of report to generate.\nThe `Accept` header sent by the client determines the format of the report.\nCurrently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),\nspdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)\n"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "The desired report in the desired output format",
+      "content": {
+       "application/vnd.cyclonedx+json": {
+        "schema": {
+         "type": "string"
+        }
+       },
+       "application/vnd.cyclonedx+xml": {
+        "schema": {
+         "type": "string"
+        }
+       },
+       "application/spdx+json": {
+        "schema": {
+         "type": "string"
+        }
+       },
+       "application/spdx+xml": {
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/fix-suggestions/supported-llm-providers": {
+   "get": {
+    "tags": [
+     "supported-llm-provider-controller"
+    ],
+    "summary": "Get the supported LLM providers",
+    "description": "Returns the LLM providers that could be used for requesting an AI fix suggestion",
+    "operationId": "getLlmProviders",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/LlmProviderResponseDto"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/fix-suggestions/issues/{issueId}": {
+   "get": {
+    "tags": [
+     "fix-suggestion-issue-controller"
+    ],
+    "summary": "Fetch AI suggestion availability for the given issueId",
+    "description": "Requires Code Viewer permission.",
+    "operationId": "get_1",
+    "parameters": [
+     {
+      "name": "issueId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/FixSuggestionIssueResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/system/email-configurations/{id}": {
+   "get": {
+    "tags": [
+     "default-email-configuration-controller"
+    ],
+    "summary": "Fetch an email configuration",
+    "description": "Fetch a Email configuration. Requires 'Administer System' permission.\n",
+    "operationId": "getEmailConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the configuration to fetch.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EmailConfigurationResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "delete": {
+    "tags": [
+     "default-email-configuration-controller"
+    ],
+    "summary": "Delete an email configuration",
+    "description": "Delete an email configuration.\nRequires 'Administer System' permission.\n",
+    "operationId": "deleteEmailConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the configuration to delete.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No Content"
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "patch": {
+    "tags": [
+     "default-email-configuration-controller"
+    ],
+    "summary": "Update an email configuration",
+    "description": "Update an email configuration. Requires 'Administer System' permission.\n",
+    "operationId": "updateEmailConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/EmailConfigurationUpdateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EmailConfigurationResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/dop-translation/github-configurations/{id}": {
+   "get": {
+    "tags": [
+     "default-github-configuration-controller"
+    ],
+    "summary": "Fetch a GitHub configuration",
+    "description": "Fetch a GitHub configuration. Requires 'Administer System' permission.\n",
+    "operationId": "getGithubConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the configuration to fetch.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GithubConfigurationResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "delete": {
+    "tags": [
+     "default-github-configuration-controller"
+    ],
+    "summary": "Delete a GitHub configuration",
+    "description": "Delete a GitHub configuration.\nRequires 'Administer System' permission.\n",
+    "operationId": "deleteGithubConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The id of the configuration to delete.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No Content"
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "patch": {
+    "tags": [
+     "default-github-configuration-controller"
+    ],
+    "summary": "Update a GitHub configuration",
+    "description": "Update a GitHub configuration. Requires 'Administer System' permission.\n",
+    "operationId": "updateGithubConfiguration",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/GithubConfigurationUpdateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GithubConfigurationResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/clean-code-policy/mode": {
+   "get": {
+    "tags": [
+     "default-mode-controller"
+    ],
+    "summary": "Retrieve current instance Mode",
+    "description": "Fetch the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.\n",
+    "operationId": "getMode",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ModeResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "patch": {
+    "tags": [
+     "default-mode-controller"
+    ],
+    "summary": "Update current instance Mode",
+    "description": "Update the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.\nRequires 'Administer System' permission.\n",
+    "operationId": "patchMode",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ModeResource"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ModeResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/dop-translation/github-permission-mappings/{role}": {
+   "delete": {
+    "tags": [
+     "github-permission-mappings-controller"
+    ],
+    "summary": "Delete a single permission mappings",
+    "description": "Requires 'Administer System' permission.",
+    "operationId": "deleteMapping_1",
+    "parameters": [
+     {
+      "name": "role",
+      "in": "path",
+      "description": "The name of the role to delete",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "No Content"
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "patch": {
+    "tags": [
+     "github-permission-mappings-controller"
+    ],
+    "summary": "Update a single permission mapping",
+    "description": "Requires 'Administer System' permission.",
+    "operationId": "updateMapping_1",
+    "parameters": [
+     {
+      "name": "role",
+      "in": "path",
+      "description": "The name of the role to update",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/DevOpsPermissionMappingUpdateRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PermissionMappingsResource"
         }
        }
       }
@@ -2358,80 +2150,6 @@
     "x-sonar-internal": "true"
    }
   },
-  "/v2/sca/sbom-reports": {
-   "get": {
-    "tags": [
-     "i"
-    ],
-    "summary": "Get a software bill of materials (SBOM) report",
-    "description": "Return a report based on the dependencies in this project's branch, using\nthe type parameter and Accept header to select the report to generate.\n\nRight now, the available reports have specialized MIME types that\ngo along with those formats:\n\n* CycloneDX: https://cyclonedx.org/specification/overview/\n  * JSON \u0026 XML\n* SPDX 2.3: https://spdx.github.io/spdx-spec/v2.3/\n  * JSON \u0026 XML\n\nTheoretically you could send just the MIME type for the format you wanted\nas the Accept header and get that report. However, there may be other\nformats that don't have a specific MIME type attached -- think two\ndifferent flavors of a CSV report, for example. In that case, we still\nneed a specific report type parameter to help differentiate more.\n\nThis is an internal API and is subject to change without notice.\n",
-    "operationId": "generateReport",
-    "parameters": [
-     {
-      "name": "projectKey",
-      "in": "query",
-      "description": "Key of the project to build report for",
-      "required": true,
-      "schema": {
-       "type": "string",
-       "description": "Key of the project to build report for"
-      }
-     },
-     {
-      "name": "branchKey",
-      "in": "query",
-      "description": "Key of the branch to build report for",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "Key of the branch to build report for"
-      }
-     },
-     {
-      "name": "type",
-      "in": "query",
-      "description": "Type of report to generate.\nThe `Accept` header sent by the client determines the format of the report.\nCurrently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),\nspdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)\n",
-      "required": true,
-      "schema": {
-       "type": "string",
-       "enum": [
-        "cyclonedx",
-        "spdx_23"
-       ],
-       "description": "Type of report to generate.\nThe `Accept` header sent by the client determines the format of the report.\nCurrently supported: cyclonedx (application/vnd.cyclonedx+json), cyclonedx (application/vnd.cyclonedx+xml),\nspdx (application/vnd.spdx+json), spdx (application/vnd.spdx+xml)\n"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "The desired report in the desired output format",
-      "content": {
-       "application/vnd.cyclonedx+json": {
-        "schema": {
-         "type": "string"
-        }
-       },
-       "application/vnd.cyclonedx+xml": {
-        "schema": {
-         "type": "string"
-        }
-       },
-       "application/spdx+json": {
-        "schema": {
-         "type": "string"
-        }
-       },
-       "application/spdx+xml": {
-        "schema": {
-         "type": "string"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
   "/v2/analysis/version": {
    "get": {
     "tags": [
@@ -2454,21 +2172,53 @@
     }
    }
   },
-  "/v2/dop-translation/dop-settings": {
+  "/v2/analysis/jres/{id}": {
    "get": {
     "tags": [
-     "default-dop-settings-controller"
+     "default-jres-controller"
     ],
-    "summary": "List all DevOps Platform Integration settings",
-    "description": "Requires the 'Create Projects' permission ",
-    "operationId": "fetchAllDopSettings",
+    "summary": "JRE download/metadata",
+    "description": "This endpoint return the JRE metadata by default. To download the JRE binary asset, set the Accept header of the request to 'application/octet-stream'.",
+    "operationId": "downloadJre",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "path",
+      "description": "The ID of the JRE",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
     "responses": {
      "200": {
       "description": "OK",
       "content": {
+       "application/octet-stream": {
+        "schema": {
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/JreInfoRestResponse"
+          },
+          {
+           "type": "string",
+           "format": "binary"
+          }
+         ]
+        }
+       },
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/DopSettingsRestResponse"
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/JreInfoRestResponse"
+          },
+          {
+           "type": "string",
+           "format": "binary"
+          }
+         ]
         }
        }
       }
@@ -2476,19 +2226,281 @@
     }
    }
   },
-  "/v2/fix-suggestions/ai-suggestions": {
+  "/v2/dop-translation/bound-projects": {
    "post": {
     "tags": [
-     "fix-suggestion-controller"
+     "default-bound-projects-controller"
     ],
-    "summary": "Suggest a fix for the given issueId",
-    "description": "Requires Code Viewer permission.",
-    "operationId": "create_1",
+    "summary": "Create a SonarQube project with the information from the provided DevOps platform project.",
+    "description": "Create a SonarQube project with the information from the provided DevOps platform project.\nAutoconfigure Pull-Request decoration mechanism.\nRequires the 'Create Projects' permission and setting a Personal Access Token with api/alm_integrations/set_pat for a user who will be using this endpoint\n",
+    "operationId": "createBoundProject",
     "requestBody": {
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/FixSuggestionPostRequest"
+        "$ref": "#/components/schemas/BoundProjectCreateRestRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "description": "Created",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BoundProjectCreateRestResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/analysis/jres": {
+   "get": {
+    "tags": [
+     "default-jres-controller"
+    ],
+    "summary": "All JREs metadata",
+    "description": "Get metadata of all available JREs",
+    "operationId": "getJresMetadata",
+    "parameters": [
+     {
+      "name": "os",
+      "in": "query",
+      "description": "Filter the JRE by operating system. Accepted values are 'windows', 'linux', 'macos', 'alpine' (case-insensitive), with some aliases",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "arch",
+      "in": "query",
+      "description": "Filter the JRE by CPU architecture. Accepted values are 'x64' and 'aarch64' (case-insensitive), with some aliases.",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/JreInfoRestResponse"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/gitlab-synchronization-runs": {
+   "post": {
+    "tags": [
+     "gitlab-synchronization-run-controller"
+    ],
+    "summary": "Starts a GitLab synchronization run.",
+    "description": "  Adds a new GitLab synchronization run in the background tasks. Requires sys-admins permissions.\n",
+    "operationId": "create_2",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GitlabSynchronizationRunResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/fix-suggestions/service-info/subscription-type": {
+   "get": {
+    "tags": [
+     "service-info-controller"
+    ],
+    "summary": "Request subscription information of AI CodeFix service",
+    "operationId": "getSubscriptionType",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SubscriptionTypeResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/project-bindings": {
+   "get": {
+    "tags": [
+     "default-project-bindings-controller"
+    ],
+    "summary": "Search across project bindings",
+    "operationId": "getProjectBindingByProjectId",
+    "parameters": [
+     {
+      "name": "repository",
+      "in": "query",
+      "description": "Filter on the repository name.\nThis parameter performs an exact, case insensitive, match.\n",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "Filter on the repository name.\nThis parameter performs an exact, case insensitive, match.\n"
+      }
+     },
+     {
+      "name": "dopSettingId",
+      "in": "query",
+      "description": "Filter on the DevOps Platform setting id.",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "description": "Filter on the DevOps Platform setting id."
+      }
+     },
+     {
+      "name": "pageSize",
+      "in": "query",
+      "description": "Number of results per page. A value of 0 will only return the pagination information.",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 500,
+       "minimum": 0,
+       "format": "int32",
+       "description": "Number of results per page. A value of 0 will only return the pagination information.",
+       "default": 50
+      }
+     },
+     {
+      "name": "pageIndex",
+      "in": "query",
+      "description": "1-based page index",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "format": "int32",
+       "description": "1-based page index",
+       "default": 1
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectBindingsSearchRestResponse"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/architecture/file-graph": {
+   "get": {
+    "tags": [
+     "n"
+    ],
+    "summary": "Find the file graph for this project branch and source.",
+    "operationId": "篯",
+    "parameters": [
+     {
+      "name": "projectKey",
+      "in": "query",
+      "description": "The key of the project.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "branchKey",
+      "in": "query",
+      "description": "The key of the branch.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "source",
+      "in": "query",
+      "description": "The source that produced this graph. eg. java, python, js, etc.",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   }
+  },
+  "/v2/sca/feature-enablements": {
+   "get": {
+    "tags": [
+     "n"
+    ],
+    "summary": "Get the status of SCA enablement",
+    "operationId": "getFeatureEnablement",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/FeatureEnablementResource"
+        }
+       }
+      }
+     }
+    },
+    "x-sonar-internal": "true"
+   },
+   "patch": {
+    "tags": [
+     "n"
+    ],
+    "summary": "Update SCA enablement settings",
+    "operationId": "updateFeatureEnablement",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/FeatureEnablementRequest"
        }
       }
      },
@@ -2500,12 +2512,13 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/FixSuggestionResponse"
+         "$ref": "#/components/schemas/FeatureEnablementResource"
         }
        }
       }
      }
-    }
+    },
+    "x-sonar-internal": "true"
    }
   },
   "/v2/dop-translation/gitlab-configurations": {
@@ -2562,19 +2575,106 @@
     "x-sonar-internal": "true"
    }
   },
-  "/v2/sca/releases/{key}": {
+  "/v2/fix-suggestions/feature-enablements": {
    "get": {
     "tags": [
-     "i"
+     "feature-enablement-controller"
     ],
-    "summary": "Get a single release",
-    "description": "Fetch a single release by its key.\n\nThis single-release endpoint lists full details for all dependencies\nthat mention the release.\n\nIn the terminology of this endpoint, a \"release\" is a version of\na package like \"lodash 1.2.3\", and a \"dependency\" is a specific file\nand scope that pulls in the release such as \"subproject/pom.xml test\".\nEach returned release may have multiple dependencies.\n\nThis is an internal API and is subject to change without notice.\n",
-    "operationId": "fetchRelease",
+    "summary": "Fetch the Ai CodeFix feature enablement configurations",
+    "operationId": "getFeatureEnablement_1",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/FeatureEnablementResponse"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "feature-enablement-controller"
+    ],
+    "summary": "Enable/Disable the AI CodeFix feature at the instance or project level",
+    "operationId": "updateFeatureEnablement_1",
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/FeatureEnablementRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "No Content"
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/dop-settings": {
+   "get": {
+    "tags": [
+     "default-dop-settings-controller"
+    ],
+    "summary": "List all DevOps Platform Integration settings",
+    "description": "Requires the 'Create Projects' permission ",
+    "operationId": "fetchAllDopSettings",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DopSettingsRestResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/system/migrations-status": {
+   "get": {
+    "tags": [
+     "database-migrations-controller"
+    ],
+    "summary": "Gets the status of ongoing database migrations, if any",
+    "description": "Return the detailed status of ongoing database migrations including starting date. If no migration is ongoing or needed it is still possible to call this endpoint and receive appropriate information.",
+    "operationId": "getStatus",
+    "responses": {
+     "200": {
+      "description": "OK",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DatabaseMigrationsResponse"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v2/dop-translation/gitlab-permission-mappings/{role}": {
+   "delete": {
+    "tags": [
+     "gitlab-permission-mappings-controller"
+    ],
+    "summary": "Delete a single permission mappings",
+    "description": "Requires 'Administer System' permission.",
+    "operationId": "deleteMapping",
     "parameters": [
      {
-      "name": "key",
+      "name": "role",
       "in": "path",
-      "description": "The key of the release to fetch.",
+      "description": "The name of the role to delete",
       "required": true,
       "schema": {
        "type": "string"
@@ -2582,100 +2682,47 @@
      }
     ],
     "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ReleaseDetailResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/clean-code-policy/mode": {
-   "get": {
-    "tags": [
-     "default-mode-controller"
-    ],
-    "summary": "Retrieve current instance Mode",
-    "description": "Fetch the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.\n",
-    "operationId": "getMode",
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ModeResource"
-        }
-       }
-      }
+     "204": {
+      "description": "No Content"
      }
     },
     "x-sonar-internal": "true"
    },
    "patch": {
     "tags": [
-     "default-mode-controller"
+     "gitlab-permission-mappings-controller"
     ],
-    "summary": "Update current instance Mode",
-    "description": "Update the current instance mode. Can be Multi-Quality Rules (MQR) Mode or Standard Experience.\nRequires 'Administer System' permission.\n",
-    "operationId": "patchMode",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/ModeResource"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "description": "OK",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/ModeResource"
-        }
-       }
-      }
-     }
-    },
-    "x-sonar-internal": "true"
-   }
-  },
-  "/v2/sca/issues-releases/{key}": {
-   "get": {
-    "tags": [
-     "i"
-    ],
-    "summary": "Get a single issue-release pair",
-    "description": "Fetch a single (issue,release) pair (dependency risk), using the key from the search endpoint.\n\nThis is an internal API and is subject to change without notice.\n",
-    "operationId": "fetchIssueRelease",
+    "summary": "Update a single permission mapping",
+    "description": "Requires 'Administer System' permission.",
+    "operationId": "updateMapping",
     "parameters": [
      {
-      "name": "key",
+      "name": "role",
       "in": "path",
-      "description": "The key of the issue,release pair to fetch.",
+      "description": "The name of the role to update",
       "required": true,
       "schema": {
        "type": "string"
       }
      }
     ],
+    "requestBody": {
+     "content": {
+      "application/merge-patch+json": {
+       "schema": {
+        "$ref": "#/components/schemas/DevOpsPermissionMappingUpdateRequest"
+       }
+      }
+     },
+     "required": true
+    },
     "responses": {
      "200": {
       "description": "OK",
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/IssueReleaseDetailsResource"
+         "$ref": "#/components/schemas/PermissionMappingsResource"
         }
        }
       }
@@ -2684,105 +2731,58 @@
     "x-sonar-internal": "true"
    }
   },
-  "/v2/authorizations/group-memberships": {
+  "/v2/dop-translation/gitlab-permission-mappings": {
    "get": {
     "tags": [
-     "default-group-membership-controller"
+     "gitlab-permission-mappings-controller"
     ],
-    "summary": "Search across group memberships",
-    "description": "  Get the list of groups and members matching the query.\n",
-    "operationId": "search_2",
-    "parameters": [
-     {
-      "name": "userId",
-      "in": "query",
-      "description": "ID of the user for which to search groups. If not set, all groups are returned.",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "ID of the user for which to search groups. If not set, all groups are returned."
-      }
-     },
-     {
-      "name": "groupId",
-      "in": "query",
-      "description": "ID of the group for which to search members. If not set, all groups are returned.",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "description": "ID of the group for which to search members. If not set, all groups are returned."
-      }
-     },
-     {
-      "name": "pageSize",
-      "in": "query",
-      "description": "Number of results per page. A value of 0 will only return the pagination information.",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "maximum": 500,
-       "minimum": 0,
-       "format": "int32",
-       "description": "Number of results per page. A value of 0 will only return the pagination information.",
-       "default": 50
-      }
-     },
-     {
-      "name": "pageIndex",
-      "in": "query",
-      "description": "1-based page index",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "minimum": 1,
-       "format": "int32",
-       "description": "1-based page index",
-       "default": 1
-      }
-     }
-    ],
+    "summary": "Fetch permissions mapping",
+    "description": "Get the list of all the existing roles with their permission mappings. Requires 'Administer System' permission.",
+    "operationId": "fetchAll",
     "responses": {
      "200": {
       "description": "OK",
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/GroupsMembershipSearchRestResponse"
+         "$ref": "#/components/schemas/PermissionMappingsSearchRestResponse"
         }
        }
       }
      }
-    }
+    },
+    "x-sonar-internal": "true"
    },
    "post": {
     "tags": [
-     "default-group-membership-controller"
+     "gitlab-permission-mappings-controller"
     ],
-    "summary": "Add a group membership",
-    "description": "Add a user to a group.",
-    "operationId": "create_6",
+    "summary": "Create a permission mapping for a custom role",
+    "description": "Requires 'Administer System' permission.",
+    "operationId": "createMapping",
     "requestBody": {
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/GroupMembershipCreateRestRequest"
+        "$ref": "#/components/schemas/PermissionMappingsPostRequest"
        }
       }
      },
      "required": true
     },
     "responses": {
-     "201": {
-      "description": "Created",
+     "200": {
+      "description": "OK",
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/GroupMembershipRestResponse"
+         "$ref": "#/components/schemas/PermissionMappingsResource"
         }
        }
       }
      }
-    }
+    },
+    "x-sonar-internal": "true"
    }
   },
   "/api/alm_integrations/import_azure_project": {
@@ -7858,7 +7858,7 @@
      {
       "name": "metricKeys",
       "in": "query",
-      "description": "Comma-separated list of metric keys. Types DISTRIB are not allowed. For type DATA only security_issues, maintainability_issues, reliability_issues, new_maintainability_issues, new_security_issues, new_reliability_issues metrics are supported",
+      "description": "Comma-separated list of metric keys. Types DISTRIB are not allowed. For type DATA only new_maintainability_issues, new_security_issues, new_reliability_issues, security_issues, maintainability_issues, reliability_issues metrics are supported",
       "required": true,
       "allowEmptyValue": true,
       "schema": {
@@ -11621,7 +11621,7 @@
      {
       "name": "metric",
       "in": "query",
-      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003c/ul\u003e",
+      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003c/ul\u003e",
       "required": true,
       "allowEmptyValue": true,
       "schema": {
@@ -12397,7 +12397,7 @@
      {
       "name": "metric",
       "in": "query",
-      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003c/ul\u003e",
+      "description": "Condition metric.\u003cbr/\u003e Only metric of the following types are allowed:\u003cul\u003e\u003cli\u003eINT\u003c/li\u003e\u003cli\u003eMILLISEC\u003c/li\u003e\u003cli\u003eRATING\u003c/li\u003e\u003cli\u003eWORK_DUR\u003c/li\u003e\u003cli\u003eFLOAT\u003c/li\u003e\u003cli\u003ePERCENT\u003c/li\u003e\u003cli\u003eLEVEL\u003c/li\u003e\u003c/ul\u003eFollowing metrics are forbidden:\u003cul\u003e\u003cli\u003esecurity_hotspots\u003c/li\u003e\u003cli\u003enew_security_hotspots\u003c/li\u003e\u003cli\u003ealert_status\u003c/li\u003e\u003c/ul\u003e",
       "required": true,
       "allowEmptyValue": true,
       "schema": {
@@ -19585,6 +19585,9 @@
      "createdAt": {
       "type": "string"
      },
+     "assignee": {
+      "$ref": "#/components/schemas/UserResource"
+     },
      "vulnerabilityId": {
       "type": "string"
      },
@@ -19655,6 +19658,23 @@
      }
     }
    },
+   "UserResource": {
+    "type": "object",
+    "properties": {
+     "login": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "avatar": {
+      "type": "string"
+     },
+     "active": {
+      "type": "boolean"
+     }
+    }
+   },
    "IssueReleaseResource": {
     "type": "object",
     "properties": {
@@ -19675,6 +19695,9 @@
      },
      "createdAt": {
       "type": "string"
+     },
+     "assignee": {
+      "$ref": "#/components/schemas/UserResource"
      },
      "vulnerabilityId": {
       "type": "string"
@@ -19756,6 +19779,9 @@
      },
      "createdAt": {
       "type": "string"
+     },
+     "assignee": {
+      "$ref": "#/components/schemas/UserResource"
      },
      "vulnerability": {
       "$ref": "#/components/schemas/VulnerabilityResource"
